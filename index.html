@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Pottery Smash 3D Ultra - リアル植木鉢投擲・粉砕シミュレーター (VR対応)</title>
+  <title>Pottery Smash 3D Ultra - リアル植木鉢投擲・粉砕シミュレーター</title>
+  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js (3D Engine) -->
@@ -133,7 +134,6 @@
       text-shadow: 0 0 24px rgba(249, 115, 22, 0.85), 0 4px 14px rgba(0, 0, 0, 0.95);
     }
 
-    /* Horizontal & Vertical scrollbar hidden */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -142,20 +142,10 @@
       scrollbar-width: none;
     }
 
-    /* Shotgun Mode active glow */
     .shotgun-active {
       background: linear-gradient(135deg, #a855f7, #ec4899) !important;
       box-shadow: 0 0 18px rgba(236, 72, 153, 0.7) !important;
       border-color: rgba(255, 255, 255, 0.8) !important;
-    }
-
-    /* VR Button Adjustment */
-    #VRButton {
-      z-index: 50 !important;
-      background: rgba(249, 115, 22, 0.9) !important;
-      border: none !important;
-      border-radius: 12px !important;
-      font-weight: bold !important;
     }
   </style>
 </head>
@@ -174,18 +164,18 @@
     <circle id="aim-target" cx="0" cy="0" r="14" fill="rgba(249, 115, 22, 0.3)" stroke="#fb923c" stroke-width="2.5" />
   </svg>
 
-  <!-- 🎯 極小ミニマルヘッダー（左上＆右上）：中央は完全に素通し -->
+  <!-- ヘッダー -->
   <div class="absolute top-2 left-2 pointer-events-none z-20 flex items-center space-x-2">
     <div class="glass-card rounded-xl px-2.5 py-1 flex items-center space-x-1.5 pointer-events-auto">
       <div class="w-5 h-5 rounded-md bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center text-white text-xs">
         <i class="fa-solid fa-burst"></i>
       </div>
       <span class="text-[11px] font-black tracking-wide text-white">POTTERY SMASH</span>
-      <span class="px-1 py-0.2 rounded text-[9px] font-black bg-indigo-500 text-white">VR READY</span>
+      <span class="px-1 py-0.2 rounded text-[9px] font-black bg-rose-500 text-white">3D</span>
     </div>
   </div>
 
-  <!-- 右上：ミニテレメトリーステータス（撃破数・球速） -->
+  <!-- ステータス -->
   <div class="absolute top-2 right-2 pointer-events-none z-20 flex items-center space-x-1.5">
     <div class="glass-card rounded-xl px-2 py-1 pointer-events-auto flex items-center space-x-1.5 text-[11px]">
       <span class="text-slate-400 font-bold">撃破:</span>
@@ -197,7 +187,7 @@
     </div>
   </div>
 
-  <!-- 👈 左側縦型ドック：植木鉢パレット（上下中央配置・左手親指で操作） -->
+  <!-- 左側ドック：植木鉢パレット -->
   <div class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-20 flex flex-col items-center">
     <div class="glass-card rounded-2xl p-1.5 flex flex-col gap-1.5 pointer-events-auto max-h-[82vh] overflow-y-auto no-scrollbar shadow-2xl" onpointerdown="event.stopPropagation()">
       <div class="text-[9px] font-black text-slate-400 text-center tracking-widest uppercase mb-0.5">鉢素材</div>
@@ -224,7 +214,7 @@
 
       <div class="w-8 h-[1px] bg-white/20 my-0.5 self-center"></div>
 
-      <!-- 💥 特殊ポット（爆弾・水晶・溶岩） -->
+      <!-- 特殊ポット -->
       <button id="type-dynamite" onclick="setPotType('dynamite')" class="pot-type-btn w-12 h-11 rounded-xl text-xs font-bold flex flex-col items-center justify-center text-rose-300 hover:text-white hover:bg-rose-600/30 border border-rose-500/30 transition" title="💣 ダイナマイト鉢 (大爆発)">
         <i class="fa-solid fa-bomb text-sm text-rose-400"></i>
         <span class="text-[9px] mt-0.5 font-bold">爆弾</span>
@@ -242,10 +232,9 @@
     </div>
   </div>
 
-  <!-- 👉 右側縦型ドック：ユーティリティ ＆ アクション（右手親指で操作） -->
+  <!-- 右側ドック：ユーティリティ ＆ アクション -->
   <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-20 flex flex-col items-end gap-2.5">
     
-    <!-- 上段：ユーティリティ縦バー（タワー再建・カメラ・スロー・清掃など） -->
     <div class="glass-card rounded-2xl p-1.5 flex flex-col gap-1.5 pointer-events-auto shadow-xl" onpointerdown="event.stopPropagation()">
       <button onclick="resetTower()" class="glass-btn w-11 h-10 rounded-xl flex items-center justify-center text-amber-300 hover:bg-amber-500/20" title="ピラミッドタワーを再構築">
         <i class="fa-solid fa-cubes-stacked text-sm"></i>
@@ -267,7 +256,7 @@
       </button>
     </div>
 
-    <!-- 下段：アクション投擲（3連射 ＆ 全力投球）右手親指のベストポジション -->
+    <!-- アクション投擲 -->
     <div class="flex flex-col gap-2 pointer-events-auto" onpointerdown="event.stopPropagation()">
       <button id="shotgun-toggle-btn" onclick="toggleShotgunMode()" class="glass-btn w-14 h-12 rounded-2xl flex flex-col items-center justify-center text-slate-200 border border-purple-400/40 hover:text-white shadow-lg" title="3連ショットガン射出">
         <i class="fa-solid fa-burst text-purple-400 text-sm"></i>
@@ -279,7 +268,6 @@
         <span class="text-[9px] font-black tracking-tighter mt-0.5">全力投球</span>
       </button>
     </div>
-
   </div>
 
   <!-- Throw Guidance / Dynamic Power Reticle -->
@@ -293,28 +281,13 @@
     </div>
   </div>
 
-  <!-- First Time User Tutorial / Hint -->
-  <div id="guide-modal" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 glass-card rounded-3xl p-5 text-center max-w-xs pointer-events-none z-20 transition-all duration-500 shadow-2xl">
-    <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white flex items-center justify-center text-2xl mb-2.5 shadow-lg shadow-orange-500/40 animate-pulse">
-      <i class="fa-solid fa-bullseye"></i>
-    </div>
-    <h2 class="text-base font-black text-white mb-1">壁やタワーを直接タップ！</h2>
-    <p class="text-[11px] text-slate-300 leading-relaxed mb-3">
-      壊したい場所を<strong class="text-amber-300">ポンと直接タップ</strong>すると、手元から一直線に飛んで激突粉砕！<br>
-      VR機器の場合は「ENTER VR」を押し、<strong class="text-amber-300">ピンチ（つまむ）動作</strong>で投げられます。
-    </p>
-    <div class="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-[10px] text-amber-200 font-semibold border border-white/10">
-      画面タップで即プレイ開始
-    </div>
-  </div>
-
   <!-- Toast notification -->
   <div id="toast-notify" class="absolute bottom-6 left-1/2 -translate-x-1/2 glass-card px-4 py-1.5 rounded-xl text-xs text-amber-300 opacity-0 transition-opacity duration-300 pointer-events-none z-30 font-semibold shadow-xl">
     新しい植木鉢を構えました！
   </div>
 
   <script>
-    let scene, camera, renderer, cameraGroup;
+    let scene, camera, renderer;
     let readyPot = null;              
     let flyingPots = [];              
     let shards = [];
@@ -326,39 +299,25 @@
     let wallImpactDecals = [];
     let speedLinesActive = false;
 
-    // 特殊ポット & 3連乱射ステート
     let isShotgunMode = false;
-    const potTypesList = ['terracotta', 'glazed', 'porcelain', 'concrete', 'dynamite', 'crystal', 'magma'];
-
-    // IMPACT POLISH: Hit-stop & Shockwaves
     let hitStopTimer = 0;             
     let shockwaves = [];              
-
-    // DESTRUCTION TARGET: Collapsible Wooden Crate Pyramid Tower
     let towerBlocks = [];             
     let crateTexture = null;
 
-    // Raycasting & Aiming System
     let raycaster, mouseNorm;
     let wallAimPlane;
     let wallTargetMarker;
     let currentAimTarget = new THREE.Vector3(0, 1.2, -12.5);
     let autoRespawnTimeout = null;
 
-    // VR Controls & UI
-    let controller1, controller2;
-    let raycasterVR;
-    let vrUI = []; // 3D UI objects for VR
-    let grabbedPots = new Map(); // VR用: 現在手で持っている鉢を管理
-
-    // Simulation timing & scales
     let isSlowMo = false;
     let timeScale = 1.0;
     let audioEnabled = true;
     let audioCtx = null;
     let activePotType = 'terracotta';
 
-    // Camera Modes
+    // Camera
     let cameraMode = 0;
     const cameraConfigs = [
       { label: '投擲手 (FPS)', pos: new THREE.Vector3(0, 0.65, 4.2), target: new THREE.Vector3(0, 0.7, -12.5) },
@@ -371,29 +330,37 @@
     let cameraShake = 0;
     let cameraFovVelocity = 0;
 
-    // Analytics
-    let analytics = { smashes: 0, shards: 0, maxSpeed: 0, maxForce: 0 };
+    let analytics = {
+      smashes: 0,
+      shards: 0,
+      maxSpeed: 0,
+      maxForce: 0
+    };
 
-    // Environment dimensions
     const ARENA = {
-      wallZ: -12.5, floorY: -2.6, sideX: 11.0, ceilY: 10.0,
+      wallZ: -12.5,
+      floorY: -2.6,
+      sideX: 11.0,
+      ceilY: 10.0,
       readyPos: new THREE.Vector3(0.55, -1.35, 1.1)
     };
 
-    // Interaction handling & anti-duplicate firing state
     let activePointerId = null;
     let isPointerDown = false;
     let pointerDownPos = { x: 0, y: 0, time: 0 };
     let dragCurrent = { x: 0, y: 0, time: 0 };
     let dragHistory = [];
     let lastThrowTime = 0;
+    let lastTimestamp = performance.now();
 
     function getAudioContext() {
       if (!audioCtx) {
         const AudioClass = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioClass();
       }
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
       return audioCtx;
     }
 
@@ -451,24 +418,6 @@
       boomGain.connect(ctx.destination);
       boomOsc.start(now);
       boomOsc.stop(now + 0.65);
-
-      const nLen = Math.floor(ctx.sampleRate * 0.6);
-      const nBuf = ctx.createBuffer(1, nLen, ctx.sampleRate);
-      const d = nBuf.getChannelData(0);
-      for (let i = 0; i < nLen; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.12));
-      const nSrc = ctx.createBufferSource();
-      nSrc.buffer = nBuf;
-      const f = ctx.createBiquadFilter();
-      f.type = 'lowpass';
-      f.frequency.setValueAtTime(1800, now);
-      f.frequency.exponentialRampToValueAtTime(180, now + 0.5);
-      const ng = ctx.createGain();
-      ng.gain.setValueAtTime(1.4, now);
-      ng.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
-      nSrc.connect(f);
-      f.connect(ng);
-      ng.connect(ctx.destination);
-      nSrc.start(now);
     }
 
     function playCrystalShatterAudio() {
@@ -476,6 +425,7 @@
       const ctx = getAudioContext();
       if (!ctx) return;
       const now = ctx.currentTime;
+
       const freqs = [4200, 5600, 7200, 9400, 11500];
       freqs.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
@@ -497,6 +447,7 @@
       const ctx = getAudioContext();
       if (!ctx) return;
       const now = ctx.currentTime;
+
       const sub = ctx.createOscillator();
       const subG = ctx.createGain();
       sub.type = 'sawtooth';
@@ -540,7 +491,9 @@
       const bufLen = Math.floor(ctx.sampleRate * dur);
       const buffer = ctx.createBuffer(1, bufLen, ctx.sampleRate);
       const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufLen) * Math.PI);
+      for (let i = 0; i < bufLen; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufLen) * Math.PI);
+      }
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
 
@@ -574,10 +527,8 @@
       const canvas = createProceduralCanvas(1024, 1024, (ctx, w, h) => {
         ctx.fillStyle = '#1e2126';
         ctx.fillRect(0, 0, w, h);
-        const rows = 18;
-        const cols = 9;
-        const rH = h / rows;
-        const cW = w / cols;
+        const rows = 18, cols = 9;
+        const rH = h / rows, cW = w / cols;
         for (let r = 0; r < rows; r++) {
           const off = (r % 2) * (cW * 0.5);
           for (let c = -1; c < cols + 1; c++) {
@@ -586,19 +537,7 @@
             const lum = 32 + Math.floor(Math.random() * 24);
             ctx.fillStyle = `hsl(215, 10%, ${lum}%)`;
             ctx.fillRect(bx + 3, by + 3, cW - 6, rH - 6);
-            for (let s = 0; s < 45; s++) {
-              ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.18)';
-              ctx.fillRect(bx + 4 + Math.random() * (cW - 8), by + 4 + Math.random() * (rH - 8), 2.5, 2.5);
-            }
           }
-        }
-        ctx.strokeStyle = '#0e1014';
-        ctx.lineWidth = 4;
-        for (let r = 0; r <= rows; r++) {
-          ctx.beginPath();
-          ctx.moveTo(0, r * rH);
-          ctx.lineTo(w, r * rH);
-          ctx.stroke();
         }
       });
       const tex = new THREE.CanvasTexture(canvas);
@@ -659,29 +598,9 @@
       const canvas = createProceduralCanvas(256, 256, (ctx, w, h) => {
         ctx.fillStyle = '#9c6634';
         ctx.fillRect(0, 0, w, h);
-        ctx.strokeStyle = 'rgba(70, 40, 15, 0.45)';
-        ctx.lineWidth = 2;
-        for (let y = 32; y < h; y += 32) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(w, y);
-          ctx.stroke();
-        }
         ctx.strokeStyle = '#5a3517';
         ctx.lineWidth = 14;
         ctx.strokeRect(7, 7, w - 14, h - 14);
-        ctx.lineWidth = 10;
-        ctx.beginPath();
-        ctx.moveTo(12, 12); ctx.lineTo(w - 12, h - 12);
-        ctx.moveTo(w - 12, 12); ctx.lineTo(12, h - 12);
-        ctx.stroke();
-        ctx.fillStyle = '#2a1a0d';
-        const studs = [[16, 16], [w - 16, 16], [16, h - 16], [w - 16, h - 16]];
-        studs.forEach(([sx, sy]) => {
-          ctx.beginPath();
-          ctx.arc(sx, sy, 4.5, 0, Math.PI * 2);
-          ctx.fill();
-        });
       });
       return new THREE.CanvasTexture(canvas);
     }
@@ -694,6 +613,7 @@
         ctx.lineWidth = 8;
         ctx.shadowColor = '#ffaa00';
         ctx.shadowBlur = 12;
+
         for (let i = 0; i < 14; i++) {
           ctx.beginPath();
           let x = Math.random() * w;
@@ -713,8 +633,7 @@
     function spawnShockwave(pos, normal = new THREE.Vector3(0, 0, 1), color = 0xffa336, maxR = 7.0) {
       const ringGeo = new THREE.RingGeometry(0.2, 0.55, 36);
       const ringMat = new THREE.MeshBasicMaterial({
-        color: color, side: THREE.DoubleSide, transparent: true,
-        opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false
+        color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false
       });
       const ring = new THREE.Mesh(ringGeo, ringMat);
       ring.position.copy(pos).addScaledVector(normal, 0.05);
@@ -727,6 +646,7 @@
       } else if (normal.z < 0) {
         ring.rotation.y = Math.PI;
       }
+
       scene.add(ring);
       shockwaves.push({ mesh: ring, radius: 0.3, maxRadius: maxR, expandSpeed: 19.0, opacity: 0.95 });
     }
@@ -745,7 +665,6 @@
 
       if (!crateTexture) crateTexture = generateCrateTexture();
       const crateMat = new THREE.MeshStandardMaterial({ map: crateTexture, roughness: 0.75, metalness: 0.15 });
-
       const bW = 0.95, bH = 0.65, bD = 0.95;
       const crateGeo = new THREE.BoxGeometry(bW, bH, bD);
 
@@ -769,8 +688,8 @@
 
           towerBlocks.push({
             mesh: blockMesh, size: new THREE.Vector3(bW, bH, bD), radius: Math.hypot(bW, bH, bD) * 0.5,
-            initialPos: new THREE.Vector3(xPos, yPos, baseZ), vel: new THREE.Vector3(0, 0, 0),
-            angVel: new THREE.Vector3(0, 0, 0), isHit: false, isResting: false
+            initialPos: new THREE.Vector3(xPos, yPos, baseZ), vel: new THREE.Vector3(0, 0, 0), angVel: new THREE.Vector3(0, 0, 0),
+            isHit: false, isResting: false
           });
         }
       }
@@ -781,408 +700,12 @@
       showToast('🗼 ピラミッドタワーを再構築しました！');
     }
 
-    // 外部のCDNに依存しない自作のVRButtonロジック
-    const VRButton = {
-      createButton: function(renderer) {
-        const button = document.createElement('button');
-        button.id = 'VRButton';
-        button.style.position = 'absolute';
-        button.style.bottom = '20px';
-        button.style.left = '50%';
-        button.style.transform = 'translateX(-50%)';
-        button.style.padding = '12px 24px';
-        button.style.color = '#fff';
-        button.style.font = 'normal 14px sans-serif';
-        button.style.fontWeight = 'bold';
-        button.style.zIndex = '50';
-        button.style.cursor = 'pointer';
-        button.style.letterSpacing = '1px';
-
-        if ('xr' in navigator) {
-          button.textContent = 'CHECKING VR...';
-          navigator.xr.isSessionSupported('immersive-vr').then(function(supported) {
-            if (supported) {
-              button.textContent = 'ENTER VR';
-              let currentSession = null;
-              function onSessionStarted(session) {
-                session.addEventListener('end', onSessionEnded);
-                renderer.xr.setSession(session);
-                button.textContent = 'EXIT VR';
-                currentSession = session;
-              }
-              function onSessionEnded() {
-                currentSession.removeEventListener('end', onSessionEnded);
-                button.textContent = 'ENTER VR';
-                currentSession = null;
-              }
-              button.onclick = function() {
-                if (currentSession === null) {
-                  const sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] };
-                  navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted);
-                } else {
-                  currentSession.end();
-                }
-              };
-            } else {
-              button.textContent = 'VR NOT SUPPORTED';
-              button.style.opacity = '0.5';
-              button.style.cursor = 'auto';
-            }
-          }).catch(function() {
-            button.textContent = 'VR ERROR';
-            button.style.opacity = '0.5';
-          });
-        } else {
-          button.textContent = 'WEBXR NOT AVAILABLE';
-          button.style.opacity = '0.5';
-          button.style.cursor = 'auto';
-        }
-        return button;
-      }
-    };
-
-    function initScene() {
-      const container = document.getElementById('canvas-container');
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x08090d);
-      scene.fog = new THREE.FogExp2(0x08090d, 0.022);
-
-      // Camera setup with Group for WebXR positioning
-      camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
-      cameraGroup = new THREE.Group();
-      scene.add(cameraGroup);
-      cameraGroup.add(camera);
-
-      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-      renderer.setSize(w, h);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.25;
-      
-      // Enable WebXR (VR)
-      renderer.xr.enabled = true;
-      container.appendChild(renderer.domElement);
-
-      updateCameraPositionImmediate();
-
-      document.body.appendChild( VRButton.createButton( renderer ) );
-
-      raycaster = new THREE.Raycaster();
-      mouseNorm = new THREE.Vector2(0, 0);
-
-      setupEnvironment();
-      setupAimMarker();
-      setupLighting();
-      buildPyramidTower();
-      spawnReadyPot();
-      
-      // Setup VR specific additions
-      setupVRControllers();
-      setupVRUI();
-
-      window.addEventListener('resize', onResize);
-      setupInputControllers();
-    }
-
-    function setupVRUI() {
-      // VR空間内に浮かぶ専用ホログラムUI (左:鉢変更、右:タワーリセット)
-      // 1. タワー再建 (右上のオレンジキューブ)
-      const resetGeo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
-      const resetMat = new THREE.MeshStandardMaterial({color: 0xffaa00, emissive: 0x664400, roughness: 0.2, wireframe: true});
-      const resetMesh = new THREE.Mesh(resetGeo, resetMat);
-      resetMesh.position.set(7.5, 4.5, -9); 
-      scene.add(resetMesh);
-      vrUI.push({ mesh: resetMesh, action: 'reset' });
-
-      // 2. 鉢変更 (左上の青い球体)
-      const changeGeo = new THREE.SphereGeometry(0.8, 16, 16);
-      const changeMat = new THREE.MeshStandardMaterial({color: 0x0088ff, emissive: 0x003388, roughness: 0.2, wireframe: true});
-      const changeMesh = new THREE.Mesh(changeGeo, changeMat);
-      changeMesh.position.set(-7.5, 4.5, -9); 
-      scene.add(changeMesh);
-      vrUI.push({ mesh: changeMesh, action: 'change' });
-    }
-
-    function setupVRControllers() {
-      raycasterVR = new THREE.Raycaster();
-
-      function onSelectStartVR(event) {
-        const controller = event.target;
-        const tempMatrix = new THREE.Matrix4();
-        tempMatrix.identity().extractRotation(controller.matrixWorld);
-        raycasterVR.ray.origin.setFromMatrixPosition(controller.matrixWorld);
-        raycasterVR.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-
-        // 1. UI Check first
-        const uiIntersects = raycasterVR.intersectObjects(vrUI.map(u => u.mesh));
-        if (uiIntersects.length > 0) {
-            const hitUI = vrUI.find(u => u.mesh === uiIntersects[0].object);
-            if (hitUI) {
-                if (hitUI.action === 'reset') resetTower();
-                else if (hitUI.action === 'change') cyclePotType();
-                playAuthenticImpactAudio(0.5);
-                createTapRippleUI(window.innerWidth/2, window.innerHeight/2); // dummy feedback
-            }
-            return;
-        }
-
-        // 2. 空間をピンチしたら、手元に鉢を出す（Grab）
-        // 手に持っている間はエイム用のレーザーを非表示にする
-        const line = controller.getObjectByName('line');
-        if (line) line.visible = false;
-
-        const potData = buildPotModel(activePotType);
-        const pot = {
-            mesh: potData.group, bodyMat: potData.bodyMat, soilMat: potData.soilMat, leafMat: potData.leafMat,
-            potType: potData.potType
-        };
-        
-        // シーンに追加（手の中に生成）
-        pot.mesh.position.set(0, 0, 0); 
-        pot.mesh.rotation.set(0, 0, 0);
-        scene.add(pot.mesh);
-
-        grabbedPots.set(controller, {
-            pot: pot,
-            history: [] // 投擲速度を計算するための位置履歴
-        });
-      }
-
-      function onSelectEndVR(event) {
-        const controller = event.target;
-        
-        // レーザーを再表示
-        const line = controller.getObjectByName('line');
-        if (line) line.visible = true;
-
-        if (grabbedPots.has(controller)) {
-            const grabData = grabbedPots.get(controller);
-            const pot = grabData.pot;
-            const history = grabData.history;
-
-            // 直前の腕の振りから投擲速度（Velocity）を計算
-            let velocity = new THREE.Vector3(0, 0, 0);
-            if (history.length > 1) {
-                const oldest = history[0];
-                const newest = history[history.length - 1];
-                const dt = Math.max((newest.time - oldest.time) / 1000, 0.016);
-                
-                velocity.subVectors(newest.pos, oldest.pos).divideScalar(dt);
-                
-                // ハンドトラッキングでの投擲は弱くなりがちなので、VR補正をかける
-                velocity.multiplyScalar(2.2); // 腕の振りを倍増
-                velocity.y += 2.5; // 重力に負けないよう少し上方向へふんわりアシスト
-                
-                // 腕を振っている方向へ少し追加アシスト
-                const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(controller.quaternion);
-                velocity.add(forward.multiplyScalar(2.0));
-            } else {
-                // 振らずにその場で手を離した場合は、軽く前へぽろっと落とす
-                const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(controller.quaternion);
-                velocity.copy(forward).multiplyScalar(4.0);
-                velocity.y += 1.5;
-            }
-
-            flyingPots.push({
-                mesh: pot.mesh, bodyMat: pot.bodyMat, soilMat: pot.soilMat, leafMat: pot.leafMat,
-                potType: pot.potType, velocity: velocity,
-                angularVel: new THREE.Vector3((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, -velocity.x * 0.35),
-                trailTimer: 0
-            });
-
-            playThrowWhooshAudio(Math.abs(velocity.length()) / 18.0);
-            grabbedPots.delete(controller); // 手の中から削除
-        }
-      }
-
-      controller1 = renderer.xr.getController(0);
-      controller1.addEventListener('selectstart', onSelectStartVR);
-      controller1.addEventListener('selectend', onSelectEndVR); // 離した時のイベントを追加
-      scene.add(controller1);
-
-      controller2 = renderer.xr.getController(1);
-      controller2.addEventListener('selectstart', onSelectStartVR);
-      controller2.addEventListener('selectend', onSelectEndVR); // 離した時のイベントを追加
-      scene.add(controller2);
-
-      // コントローラー・ハンドトラッキングのレイ（光線）
-      const geometry = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0, 0, -1)
-      ]);
-      const material = new THREE.LineBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.5 });
-      const line = new THREE.Line(geometry, material);
-      line.name = 'line';
-      line.scale.z = 20;
-
-      controller1.add(line.clone());
-      controller2.add(line.clone());
-    }
-
-    function updateVRControllers() {
-      if (!renderer.xr.isPresenting) return;
-      
-      const now = performance.now();
-
-      [controller1, controller2].forEach(controller => {
-        if (controller && controller.visible) {
-          
-          // 鉢を持っている場合は、鉢の位置を手に追従させる
-          if (grabbedPots.has(controller)) {
-              const grabData = grabbedPots.get(controller);
-              
-              // コントローラー（手）の世界座標を取得
-              const controllerPos = new THREE.Vector3();
-              const controllerRot = new THREE.Quaternion();
-              controller.matrixWorld.decompose(controllerPos, controllerRot, new THREE.Vector3());
-
-              grabData.pot.mesh.position.copy(controllerPos);
-              grabData.pot.mesh.quaternion.copy(controllerRot);
-              
-              // 手の中に埋まらないよう、少し手のひらの前方へオフセット
-              const offset = new THREE.Vector3(0, -0.05, -0.15).applyQuaternion(controllerRot);
-              grabData.pot.mesh.position.add(offset);
-
-              // 速度計算用に直近の数フレームの位置を記録
-              grabData.history.push({ pos: grabData.pot.mesh.position.clone(), time: now });
-              if (grabData.history.length > 5) grabData.history.shift(); // 過去5フレーム分を保持
-
-          } else {
-              // 持っていない時はUI操作用のレイキャスト（光線）を処理
-              const tempMatrix = new THREE.Matrix4();
-              tempMatrix.identity().extractRotation(controller.matrixWorld);
-              raycasterVR.ray.origin.setFromMatrixPosition(controller.matrixWorld);
-              raycasterVR.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-
-              let hitDist = 20;
-              const uiIntersects = raycasterVR.intersectObjects(vrUI.map(u => u.mesh));
-              if (uiIntersects.length > 0) {
-                  hitDist = uiIntersects[0].distance;
-              } else {
-                  const hitPoint = new THREE.Vector3();
-                  const intersects = raycasterVR.ray.intersectPlane(wallAimPlane, hitPoint);
-                  if (intersects) {
-                      hitDist = raycasterVR.ray.origin.distanceTo(hitPoint);
-                      hitPoint.x = Math.max(-ARENA.sideX + 1.2, Math.min(ARENA.sideX - 1.2, hitPoint.x));
-                      hitPoint.y = Math.max(ARENA.floorY + 0.6, Math.min(ARENA.ceilY - 0.5, hitPoint.y));
-                      hitPoint.z = ARENA.wallZ;
-                      
-                      if (wallTargetMarker) {
-                        wallTargetMarker.position.copy(hitPoint);
-                      }
-                  }
-              }
-              
-              const line = controller.getObjectByName('line');
-              if (line) line.scale.z = hitDist;
-          }
-        }
-      });
-    }
-
-    function setupAimMarker() {
-      wallAimPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -ARENA.wallZ);
-
-      const markerCanvas = createProceduralCanvas(128, 128, (ctx, w, h) => {
-        ctx.clearRect(0, 0, w, h);
-        ctx.strokeStyle = 'rgba(251, 146, 60, 0.95)';
-        ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.arc(w / 2, h / 2, 48, 0, Math.PI * 2); ctx.stroke();
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.95)';
-        ctx.beginPath(); ctx.arc(w / 2, h / 2, 10, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = 'rgba(251, 146, 60, 0.85)';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(w / 2, 6); ctx.lineTo(w / 2, 28);
-        ctx.moveTo(w / 2, h - 6); ctx.lineTo(w / 2, h - 28);
-        ctx.moveTo(6, h / 2); ctx.lineTo(28, h / 2);
-        ctx.moveTo(w - 6, h / 2); ctx.lineTo(w - 28, h / 2);
-        ctx.stroke();
-      });
-
-      const markerMat = new THREE.MeshBasicMaterial({
-        map: new THREE.CanvasTexture(markerCanvas), transparent: true, opacity: 0.85, depthWrite: false
-      });
-      wallTargetMarker = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.8), markerMat);
-      wallTargetMarker.position.set(0, 1.2, ARENA.wallZ + 0.05);
-      scene.add(wallTargetMarker);
-    }
-
-    function setupEnvironment() {
-      const wallMat = new THREE.MeshStandardMaterial({ map: generateWallTexture(), roughness: 0.82, metalness: 0.12 });
-      const wallMesh = new THREE.Mesh(new THREE.PlaneGeometry(26, 18), wallMat);
-      wallMesh.position.set(0, 4.5, ARENA.wallZ);
-      wallMesh.receiveShadow = true;
-      scene.add(wallMesh);
-
-      const targetCanvas = createProceduralCanvas(256, 256, (ctx, w, h) => {
-        ctx.clearRect(0, 0, w, h);
-        ctx.strokeStyle = 'rgba(255, 160, 40, 0.45)'; ctx.lineWidth = 12;
-        ctx.beginPath(); ctx.arc(w/2, h/2, 95, 0, Math.PI * 2); ctx.stroke();
-        ctx.strokeStyle = 'rgba(255, 60, 20, 0.6)'; ctx.lineWidth = 8;
-        ctx.beginPath(); ctx.arc(w/2, h/2, 50, 0, Math.PI * 2); ctx.stroke();
-        ctx.fillStyle = 'rgba(255, 220, 100, 0.8)';
-        ctx.beginPath(); ctx.arc(w/2, h/2, 14, 0, Math.PI * 2); ctx.fill();
-      });
-      const targetMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(3.6, 3.6),
-        new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(targetCanvas), transparent: true, opacity: 0.85 })
-      );
-      targetMesh.position.set(0, 1.0, ARENA.wallZ + 0.02);
-      scene.add(targetMesh);
-
-      const floorMat = new THREE.MeshStandardMaterial({ map: generateFloorTexture(), roughness: 0.38, metalness: 0.25 });
-      const floor = new THREE.Mesh(new THREE.PlaneGeometry(28, 40), floorMat);
-      floor.rotation.x = -Math.PI / 2;
-      floor.position.set(0, ARENA.floorY, 0);
-      floor.receiveShadow = true;
-      scene.add(floor);
-
-      const pedestalGeo = new THREE.CylinderGeometry(0.75, 0.9, 1.3, 32);
-      const pedestalMat = new THREE.MeshStandardMaterial({ color: 0x181a1f, roughness: 0.6, metalness: 0.3 });
-      const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
-      pedestal.position.set(ARENA.readyPos.x, ARENA.floorY + 0.65, ARENA.readyPos.z);
-      pedestal.castShadow = true;
-      pedestal.receiveShadow = true;
-      scene.add(pedestal);
-    }
-
-    function setupLighting() {
-      const ambLight = new THREE.AmbientLight(0xd5e3f5, 0.45);
-      scene.add(ambLight);
-
-      const mainSpot = new THREE.SpotLight(0xfff1e0, 2.4);
-      mainSpot.position.set(2.5, 7.5, 6);
-      mainSpot.target.position.set(0, 0.8, -6);
-      mainSpot.angle = Math.PI / 3.2;
-      mainSpot.penumbra = 0.5;
-      mainSpot.castShadow = true;
-      mainSpot.shadow.mapSize.width = 2048;
-      mainSpot.shadow.mapSize.height = 2048;
-      mainSpot.shadow.bias = -0.001;
-      scene.add(mainSpot);
-      scene.add(mainSpot.target);
-
-      const rimLight = new THREE.DirectionalLight(0x4080ff, 0.75);
-      rimLight.position.set(-6, 4.5, -9);
-      scene.add(rimLight);
-
-      const warmLight = new THREE.PointLight(0xff8833, 0.8, 12);
-      warmLight.position.set(0.4, 1.2, 3.2);
-      scene.add(warmLight);
-    }
-
     function buildPotModel(type = 'terracotta') {
       const group = new THREE.Group();
       let bodyMat, scaleMult = 1.0;
 
       if (type === 'glazed') {
-        bodyMat = new THREE.MeshStandardMaterial({ color: 0x1a727d, roughness: 0.12, metalness: 0.25, envMapIntensity: 1.4 });
+        bodyMat = new THREE.MeshStandardMaterial({ color: 0x1a727d, roughness: 0.12, metalness: 0.25 });
       } else if (type === 'porcelain') {
         bodyMat = new THREE.MeshStandardMaterial({ color: 0xf2f4f8, roughness: 0.22, metalness: 0.08 });
       } else if (type === 'concrete') {
@@ -1200,46 +723,47 @@
 
       const pts = [];
       const potH = 1.0 * scaleMult, bR = 0.42 * scaleMult, tR = 0.62 * scaleMult, rimR = 0.68 * scaleMult;
-      pts.push(new THREE.Vector2(bR * 0.8, 0.0), new THREE.Vector2(bR, 0.05), new THREE.Vector2(bR * 1.05, 0.3 * scaleMult));
-      pts.push(new THREE.Vector2(tR * 0.96, potH * 0.86), new THREE.Vector2(rimR, potH * 0.92), new THREE.Vector2(rimR, potH));
-      pts.push(new THREE.Vector2(rimR * 0.91, potH), new THREE.Vector2(tR * 0.85, potH * 0.86), new THREE.Vector2(bR * 0.75, 0.12 * scaleMult), new THREE.Vector2(0.12, 0.1));
+      pts.push(new THREE.Vector2(bR * 0.8, 0.0));
+      pts.push(new THREE.Vector2(bR, 0.05));
+      pts.push(new THREE.Vector2(bR * 1.05, 0.3 * scaleMult));
+      pts.push(new THREE.Vector2(tR * 0.96, potH * 0.86));
+      pts.push(new THREE.Vector2(rimR, potH * 0.92));
+      pts.push(new THREE.Vector2(rimR, potH));
+      pts.push(new THREE.Vector2(rimR * 0.91, potH));
+      pts.push(new THREE.Vector2(tR * 0.85, potH * 0.86));
+      pts.push(new THREE.Vector2(bR * 0.75, 0.12 * scaleMult));
+      pts.push(new THREE.Vector2(0.12, 0.1));
 
       const potGeo = new THREE.LatheGeometry(pts, 36);
       potGeo.computeVertexNormals();
       const bodyMesh = new THREE.Mesh(potGeo, bodyMat);
-      bodyMesh.castShadow = true; bodyMesh.receiveShadow = true;
+      bodyMesh.castShadow = true;
       group.add(bodyMesh);
-
-      if (type === 'dynamite') {
-        const fuseCurve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, potH * 0.9, 0), new THREE.Vector3(0.05, potH * 1.15, 0.03), new THREE.Vector3(-0.02, potH * 1.32, 0.08)
-        ]);
-        const fuseGeo = new THREE.TubeGeometry(fuseCurve, 10, 0.022, 6, false);
-        const fuseMesh = new THREE.Mesh(fuseGeo, new THREE.MeshBasicMaterial({ color: 0x332211 }));
-        group.add(fuseMesh);
-        const sparkGeo = new THREE.SphereGeometry(0.065, 8, 8);
-        const sparkMesh = new THREE.Mesh(sparkGeo, new THREE.MeshBasicMaterial({ color: 0xffdd44 }));
-        sparkMesh.position.set(-0.02, potH * 1.32, 0.08);
-        group.add(sparkMesh);
-      }
 
       const soilMat = new THREE.MeshStandardMaterial({ map: generateSoilTexture(), roughness: 0.96, metalness: 0.02 });
       const soilGeo = new THREE.CylinderGeometry(tR * 0.85, tR * 0.76, 0.22 * scaleMult, 28);
       const soilMesh = new THREE.Mesh(soilGeo, soilMat);
-      soilMesh.position.y = potH * 0.82; soilMesh.castShadow = true;
+      soilMesh.position.y = potH * 0.82;
       group.add(soilMesh);
 
       const plantGroup = new THREE.Group();
       plantGroup.position.y = potH * 0.86;
 
       let leafColor = 0x2ea048;
-      if (type === 'glazed') leafColor = 0x227842; else if (type === 'porcelain') leafColor = 0x1d6332;
-      else if (type === 'dynamite') leafColor = 0x772211; else if (type === 'crystal') leafColor = 0x44ddee;
+      if (type === 'glazed') leafColor = 0x227842;
+      else if (type === 'porcelain') leafColor = 0x1d6332;
+      else if (type === 'dynamite') leafColor = 0x772211;
+      else if (type === 'crystal') leafColor = 0x44ddee;
       else if (type === 'magma') leafColor = 0xff6600;
 
-      const leafMat = new THREE.MeshStandardMaterial({ color: leafColor, roughness: type === 'crystal' ? 0.1 : 0.35, metalness: 0.05, side: THREE.DoubleSide });
+      const leafMat = new THREE.MeshStandardMaterial({
+        color: leafColor,
+        roughness: type === 'crystal' ? 0.1 : 0.35,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+
       const leafCount = (type === 'dynamite') ? 5 : 10;
-      
       for (let i = 0; i < leafCount; i++) {
         const ang = (i / leafCount) * Math.PI * 2 + Math.random() * 0.3;
         const stemCurve = new THREE.CatmullRomCurve3([
@@ -1249,24 +773,31 @@
         ]);
         const stemGeo = new THREE.TubeGeometry(stemCurve, 10, 0.028 * scaleMult, 6, false);
         const stem = new THREE.Mesh(stemGeo, new THREE.MeshStandardMaterial({ color: 0x1b4d24, roughness: 0.6 }));
-        stem.castShadow = true; plantGroup.add(stem);
+        stem.castShadow = true;
+        plantGroup.add(stem);
 
         const leafGeo = new THREE.PlaneGeometry(0.42 * scaleMult, 0.68 * scaleMult, 5, 7);
         const pos = leafGeo.attributes.position;
         for (let p = 0; p < pos.count; p++) {
-          const py = pos.getY(p), px = pos.getX(p);
+          const py = pos.getY(p);
+          const px = pos.getX(p);
           pos.setZ(p, Math.sin((py + 0.35) * 3) * 0.09 - (px * px) * 0.16);
         }
         leafGeo.computeVertexNormals();
 
         const leafMesh = new THREE.Mesh(leafGeo, leafMat);
-        leafMesh.position.copy(stemCurve.getPoint(1.0));
-        leafMesh.rotation.set(0.45 + Math.random() * 0.25, ang - Math.PI / 2, (Math.random() - 0.5) * 0.4);
-        leafMesh.castShadow = true; plantGroup.add(leafMesh);
+        const tip = stemCurve.getPoint(1.0);
+        leafMesh.position.copy(tip);
+        leafMesh.rotation.y = ang - Math.PI / 2;
+        leafMesh.rotation.x = 0.45 + Math.random() * 0.25;
+        leafMesh.rotation.z = (Math.random() - 0.5) * 0.4;
+        leafMesh.castShadow = true;
+        plantGroup.add(leafMesh);
       }
 
       group.add(plantGroup);
-      return { group, bodyMat, soilMat, leafMat, potType: type, scaleMult };
+
+      return { group: group, bodyMat: bodyMat, soilMat: soilMat, leafMat: leafMat, potType: type, scaleMult: scaleMult };
     }
 
     function spawnReadyPot() {
@@ -1278,7 +809,6 @@
         initialPos: new THREE.Vector3().copy(ARENA.readyPos), spawnProgress: 0
       };
       readyPot.mesh.position.copy(readyPot.initialPos);
-      readyPot.mesh.rotation.set(0, Math.random() * Math.PI, 0);
       readyPot.mesh.scale.set(0.1, 0.1, 0.1);
       scene.add(readyPot.mesh);
       return readyPot;
@@ -1286,37 +816,7 @@
 
     function scheduleAutoRespawn(delayMs = 280) {
       if (autoRespawnTimeout) clearTimeout(autoRespawnTimeout);
-      autoRespawnTimeout = setTimeout(() => { spawnReadyPot(); }, delayMs);
-    }
-
-    function addWallImpactDecal(x, y) {
-      const decalSize = 2.4 + Math.random() * 1.2;
-      const canvas = createProceduralCanvas(512, 512, (ctx, w, h) => {
-        ctx.clearRect(0, 0, w, h);
-        const grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, 180);
-        grad.addColorStop(0, 'rgba(10, 8, 7, 0.95)'); grad.addColorStop(0.3, 'rgba(40, 22, 14, 0.85)');
-        grad.addColorStop(0.7, 'rgba(25, 18, 12, 0.4)'); grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(w/2, h/2, 180, 0, Math.PI * 2); ctx.fill();
-
-        ctx.strokeStyle = 'rgba(8, 7, 6, 0.95)'; ctx.lineWidth = 3.5;
-        const numCracks = 10 + Math.floor(Math.random() * 6);
-        for (let i = 0; i < numCracks; i++) {
-          let cx = w/2, cy = h/2, angle = (i / numCracks) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
-          let len = 120 + Math.random() * 110;
-          ctx.beginPath(); ctx.moveTo(cx, cy);
-          let step = 0;
-          while (step < len) {
-            step += 18 + Math.random() * 15; angle += (Math.random() - 0.5) * 0.5;
-            cx += Math.cos(angle) * 20; cy += Math.sin(angle) * 20; ctx.lineTo(cx, cy);
-          }
-          ctx.stroke();
-        }
-      });
-      const decalMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true, opacity: 0.92, depthWrite: false });
-      const decalMesh = new THREE.Mesh(new THREE.PlaneGeometry(decalSize, decalSize), decalMat);
-      decalMesh.position.set(x, y, ARENA.wallZ + 0.03 + (wallImpactDecals.length * 0.001));
-      scene.add(decalMesh); wallImpactDecals.push(decalMesh);
-      if (wallImpactDecals.length > 20) { const old = wallImpactDecals.shift(); scene.remove(old); }
+      autoRespawnTimeout = setTimeout(() => spawnReadyPot(), delayMs);
     }
 
     function shatterPot(flyingObj) {
@@ -1325,6 +825,9 @@
       const hitSpeed = impactVel.length();
       const pType = flyingObj.potType || 'terracotta';
       const speedKmH = Math.round(hitSpeed * 3.6 * 4.4);
+
+      // VR用のスケールに合わせて破片サイズも縮小する
+      const vrScale = flyingObj.targetScale || 1.0; 
 
       analytics.smashes++;
       if (speedKmH > analytics.maxSpeed) analytics.maxSpeed = speedKmH;
@@ -1340,20 +843,8 @@
           const d = tb.mesh.position.distanceTo(impactPos);
           if (d < 6.5) {
             tb.isHit = true; tb.isResting = false;
-            const blastDir = tb.mesh.position.clone().sub(impactPos).normalize();
-            tb.vel.addScaledVector(blastDir, (6.5 - d) * 7.5); tb.vel.y += Math.random() * 4.0 + 3.0;
-            tb.angVel.set((Math.random() - 0.5) * 25, (Math.random() - 0.5) * 25, (Math.random() - 0.5) * 25);
-          }
-        });
-      } else if (pType === 'crystal') {
-        hitStopTimer = 0.045; cameraShake = 0.6; triggerFlashImpact(); playCrystalShatterAudio();
-        spawnShockwave(impactPos, new THREE.Vector3(0, 0, 1), 0x77eeff, 8.5); showCrashTextPopup("💎 CRYSTAL SHATTER!!");
-      } else if (pType === 'magma') {
-        hitStopTimer = 0.095; cameraShake = 1.8; triggerFlashImpact(); playMagmaImpactAudio();
-        spawnShockwave(impactPos, new THREE.Vector3(0, 0, 1), 0xff6600, 12.0); showCrashTextPopup("🌋 VOLCANIC CRUSH!!");
-        towerBlocks.forEach(tb => {
-          if (tb.mesh.position.distanceTo(impactPos) < 4.2) {
-            tb.isHit = true; tb.isResting = false; tb.vel.add(new THREE.Vector3((Math.random() - 0.5) * 12, Math.random() * 6 + 3, Math.random() * 8 + 4));
+            tb.vel.addScaledVector(tb.mesh.position.clone().sub(impactPos).normalize(), (6.5 - d) * 7.5);
+            tb.vel.y += Math.random() * 4.0 + 3.0;
           }
         });
       } else {
@@ -1361,130 +852,86 @@
         playAuthenticImpactAudio(hitSpeed / 10); spawnShockwave(impactPos, new THREE.Vector3(0, 0, 1), 0xff9533, 7.5);
       }
       hideSpeedLines();
-      if (impactPos.z <= ARENA.wallZ + 0.7) addWallImpactDecal(impactPos.x, impactPos.y);
 
       const shardMultiplier = (pType === 'crystal') ? 3.0 : (pType === 'magma' ? 1.4 : 1.0);
       const baseCount = Math.floor(6 * shardMultiplier);
 
+      // Base Chunks
       for (let b = 0; b < baseCount; b++) {
-        const baseSize = 0.28 + Math.random() * 0.18;
-        const baseMesh = new THREE.Mesh(new THREE.CylinderGeometry(baseSize, baseSize * 1.1, 0.09, 5), flyingObj.bodyMat);
-        baseMesh.castShadow = true; baseMesh.position.copy(impactPos).add(new THREE.Vector3((Math.random() - 0.5) * 0.4, (Math.random() - 0.5) * 0.4, 0.1));
-        baseMesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-        const burstAngle = Math.random() * Math.PI * 2, bForce = (Math.random() * 0.6 + 0.5) * hitSpeed * (pType === 'dynamite' ? 0.9 : 0.4);
+        const baseSize = (0.28 + Math.random() * 0.18) * vrScale;
+        const baseGeo = new THREE.CylinderGeometry(baseSize, baseSize * 1.1, 0.09 * vrScale, 5);
+        const baseMesh = new THREE.Mesh(baseGeo, flyingObj.bodyMat);
+        baseMesh.castShadow = true;
+        baseMesh.position.copy(impactPos).add(new THREE.Vector3((Math.random() - 0.5) * 0.4, (Math.random() - 0.5) * 0.4, 0.1));
+        const bForce = (Math.random() * 0.6 + 0.5) * hitSpeed * (pType === 'dynamite' ? 0.9 : 0.4);
+        const burstAngle = Math.random() * Math.PI * 2;
         shards.push({
-          mesh: baseMesh, vel: new THREE.Vector3(Math.cos(burstAngle) * bForce, Math.sin(burstAngle) * bForce * 0.7 + 1.5, Math.abs(impactVel.z) * (0.32 + Math.random() * 0.35)),
-          angVel: new THREE.Vector3((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20), radius: baseSize * 0.8, isResting: false
+          mesh: baseMesh,
+          vel: new THREE.Vector3(Math.cos(burstAngle) * bForce, Math.sin(burstAngle) * bForce * 0.7 + 1.5, Math.abs(impactVel.z) * 0.35),
+          angVel: new THREE.Vector3((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20),
+          radius: baseSize * 0.8, isResting: false
         });
         scene.add(baseMesh);
       }
 
+      // Shards
       const shardCount = Math.floor(45 * shardMultiplier);
       analytics.shards += shardCount;
       for (let i = 0; i < shardCount; i++) {
-        const sSize = 0.12 + Math.random() * 0.2;
-        const shardMesh = new THREE.Mesh(new THREE.ConeGeometry(sSize, sSize * 1.6, 3 + Math.floor(Math.random() * 3)), flyingObj.bodyMat);
-        shardMesh.castShadow = true; shardMesh.receiveShadow = true;
+        const sSize = (0.12 + Math.random() * 0.2) * vrScale;
+        const shardGeo = new THREE.ConeGeometry(sSize, sSize * 1.6, 3 + Math.floor(Math.random() * 3));
+        const shardMesh = new THREE.Mesh(shardGeo, flyingObj.bodyMat);
+        shardMesh.castShadow = true;
         shardMesh.position.copy(impactPos).add(new THREE.Vector3((Math.random() - 0.5) * 0.45, (Math.random() - 0.5) * 0.45, (Math.random() - 0.5) * 0.2));
-        const burstAngle = Math.random() * Math.PI * 2, burstStr = (Math.random() * 0.7 + 0.4) * hitSpeed * (pType === 'dynamite' ? 1.2 : 0.6);
+        const burstStr = (Math.random() * 0.7 + 0.4) * hitSpeed * (pType === 'dynamite' ? 1.2 : 0.6);
+        const burstAngle = Math.random() * Math.PI * 2;
         shards.push({
-          mesh: shardMesh, vel: new THREE.Vector3(Math.cos(burstAngle) * burstStr + impactVel.x * 0.3, Math.sin(burstAngle) * burstStr * 0.75 + Math.random() * 3.2, Math.abs(impactVel.z) * (0.3 + Math.random() * 0.45)),
-          angVel: new THREE.Vector3((Math.random() - 0.5) * 32, (Math.random() - 0.5) * 32, (Math.random() - 0.5) * 32), radius: sSize * 0.65, isResting: false
+          mesh: shardMesh,
+          vel: new THREE.Vector3(Math.cos(burstAngle) * burstStr + impactVel.x * 0.3, Math.sin(burstAngle) * burstStr * 0.75 + Math.random() * 3.2, Math.abs(impactVel.z) * 0.4),
+          angVel: new THREE.Vector3((Math.random() - 0.5) * 32, (Math.random() - 0.5) * 32, (Math.random() - 0.5) * 32),
+          radius: sSize * 0.65, isResting: false
         });
         scene.add(shardMesh);
       }
-
-      const rootBallMesh = new THREE.Mesh(new THREE.DodecahedronGeometry(0.32, 1), flyingObj.soilMat);
-      rootBallMesh.position.copy(impactPos).add(new THREE.Vector3(0, 0, 0.15)); rootBallMesh.castShadow = true;
-      rootBallDebris.push({ mesh: rootBallMesh, vel: new THREE.Vector3(impactVel.x * 0.2, 1.8, Math.abs(impactVel.z) * 0.22), angVel: new THREE.Vector3((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6, 0), isResting: false });
-      scene.add(rootBallMesh);
-
-      for (let s = 0; s < 80; s++) {
-        const soilMesh = new THREE.Mesh(new THREE.DodecahedronGeometry(0.045 + Math.random() * 0.065, 0), flyingObj.soilMat);
-        soilMesh.castShadow = true; soilMesh.position.copy(impactPos).add(new THREE.Vector3((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.3));
-        const ang = Math.random() * Math.PI * 2, force = (Math.random() * 0.7 + 0.3) * hitSpeed * (pType === 'dynamite' ? 0.9 : 0.45);
-        soilParticles.push({
-          mesh: soilMesh, vel: new THREE.Vector3(Math.cos(ang) * force, Math.sin(ang) * force * 0.8 + Math.random() * 2.5, Math.abs(impactVel.z) * (0.2 + Math.random() * 0.3)),
-          angVel: new THREE.Vector3((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, 0), isResting: false
-        });
-        scene.add(soilMesh);
-      }
-
-      for (let f = 0; f < 9; f++) {
-        const leafMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.5), flyingObj.leafMat);
-        leafMesh.position.copy(impactPos).add(new THREE.Vector3((Math.random() - 0.5) * 0.6, (Math.random() - 0.5) * 0.6, 0.1)); leafMesh.castShadow = true;
-        foliagePieces.push({
-          mesh: leafMesh, vel: new THREE.Vector3((Math.random() - 0.5) * 5, Math.random() * 3 + 1.2, Math.abs(impactVel.z) * 0.25 + Math.random() * 2),
-          angVel: new THREE.Vector3((Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14), flutter: Math.random() * Math.PI * 2
-        });
-        scene.add(leafMesh);
-      }
-      spawnDustExplosion(impactPos);
     }
 
-    function spawnDustExplosion(pos) {
-      const dustGeo = new THREE.PlaneGeometry(1.1, 1.1);
-      const dustMat = new THREE.MeshBasicMaterial({ color: activePotType === 'glazed' ? 0x82c8ce : (activePotType === 'porcelain' ? 0xe5eaf2 : 0xd29882), transparent: true, opacity: 0.55, depthWrite: false });
-      for (let d = 0; d < 20; d++) {
-        const dust = new THREE.Mesh(dustGeo, dustMat.clone());
-        dust.position.copy(pos).add(new THREE.Vector3((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.25));
-        dust.rotation.z = Math.random() * Math.PI * 2;
-        dustClouds.push({ mesh: dust, vel: new THREE.Vector3((Math.random() - 0.5) * 2.8, (Math.random() * 2.0 + 0.4), Math.random() * 2.5), scaleRate: 2.0 + Math.random() * 2.0, opacity: 0.65 });
-        scene.add(dust);
-      }
-    }
-
-    function emitPotTrail(pos) {
-      const trailMesh = new THREE.Mesh(new THREE.SphereGeometry(0.12, 4, 4), new THREE.MeshBasicMaterial({ color: 0xffa055, transparent: true, opacity: 0.35, depthWrite: false }));
-      trailMesh.position.copy(pos).add(new THREE.Vector3((Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2));
-      scene.add(trailMesh);
-      potTrails.push({ mesh: trailMesh, opacity: 0.35, scale: 1.0 });
-    }
-
-    function triggerFlashImpact() { const f = document.getElementById('flash-overlay'); f.style.opacity = '0.45'; setTimeout(() => f.style.opacity = '0', 70); }
-    function showSpeedLines() { if (!speedLinesActive) { speedLinesActive = true; document.getElementById('speed-overlay').style.opacity = '1'; } }
-    function hideSpeedLines() { speedLinesActive = false; document.getElementById('speed-overlay').style.opacity = '0'; }
-
-    const GRAVITY = -15.5, FLOOR_RESTITUTION = 0.28, WALL_RESTITUTION = 0.38, FRICTION = 0.88;
+    const GRAVITY = -15.5;
+    const FLOOR_RESTITUTION = 0.28;
+    const FRICTION = 0.88;
 
     function stepPhysics(delta) {
-      if (hitStopTimer > 0) {
-        hitStopTimer -= delta; updateCameraMotion(delta * 0.5); return;
-      }
+      if (hitStopTimer > 0) { hitStopTimer -= delta; updateCameraMotion(delta * 0.5); return; }
       const effDt = Math.min(delta, 0.05) * timeScale;
 
-      if (readyPot && readyPot.mesh && readyPot.spawnProgress < 1.0) {
-        readyPot.spawnProgress = Math.min(1.0, readyPot.spawnProgress + effDt * 7.0);
-        const s = Math.sin(readyPot.spawnProgress * Math.PI * 0.5); readyPot.mesh.scale.set(s, s, s);
+      if (readyPot && readyPot.mesh) {
+        if (readyPot.spawnProgress < 1.0) {
+          readyPot.spawnProgress = Math.min(1.0, readyPot.spawnProgress + effDt * 7.0);
+          const t = readyPot.spawnProgress;
+          const s = Math.sin(t * Math.PI * 0.5);
+          readyPot.mesh.scale.set(s, s, s);
+        }
       }
 
       for (let p = flyingPots.length - 1; p >= 0; p--) {
         const fp = flyingPots[p];
-        if (fp.mesh.scale.x < 1.0) fp.mesh.scale.set(1.0, 1.0, 1.0);
+        const targetScale = fp.targetScale || 1.0;
+        if (Math.abs(fp.mesh.scale.x - targetScale) > 0.01) {
+          fp.mesh.scale.set(targetScale, targetScale, targetScale);
+        }
         fp.velocity.y += GRAVITY * effDt;
         fp.mesh.position.addScaledVector(fp.velocity, effDt);
-        fp.mesh.rotation.x += fp.angularVel.x * effDt; fp.mesh.rotation.y += fp.angularVel.y * effDt; fp.mesh.rotation.z += fp.angularVel.z * effDt;
-
-        fp.trailTimer = (fp.trailTimer || 0) + effDt;
-        if (fp.trailTimer > 0.02) { fp.trailTimer = 0; emitPotTrail(fp.mesh.position); }
+        fp.mesh.rotation.x += fp.angularVel.x * effDt;
+        fp.mesh.rotation.y += fp.angularVel.y * effDt;
+        fp.mesh.rotation.z += fp.angularVel.z * effDt;
 
         let hitTower = false;
         for (let tb of towerBlocks) {
           if (fp.mesh.position.distanceTo(tb.mesh.position) < tb.radius + 0.45) {
             hitTower = true; tb.isHit = true; tb.isResting = false;
-            const potSpeed = fp.velocity.length(), hitDir = fp.velocity.clone().normalize();
-            tb.vel.copy(hitDir).multiplyScalar(potSpeed * 0.75).add(new THREE.Vector3(0, 3.5, 0));
-            tb.angVel.set((Math.random() - 0.5) * 16, (Math.random() - 0.5) * 16, (Math.random() - 0.5) * 16);
-            for (let other of towerBlocks) {
-              if (other === tb) continue;
-              const d = tb.mesh.position.distanceTo(other.mesh.position);
-              if (d < 2.5) {
-                other.isHit = true; other.isResting = false;
-                other.vel.addScaledVector(other.mesh.position.clone().sub(tb.mesh.position).normalize(), (2.5 - d) * 4.5);
-                other.vel.y += Math.random() * 2.5 + 1.2; other.angVel.add(new THREE.Vector3((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8));
-              }
-            }
-            playBlockCrashAudio(potSpeed / 12.0); showCrashTextPopup("💥 TOWER CRASH!!"); shatterPot(fp); flyingPots.splice(p, 1); break;
+            tb.vel.copy(fp.velocity.clone().normalize()).multiplyScalar(fp.velocity.length() * 0.75).add(new THREE.Vector3(0, 3.5, 0));
+            playBlockCrashAudio(); showCrashTextPopup("💥 TOWER CRASH!!");
+            shatterPot(fp); flyingPots.splice(p, 1);
+            break;
           }
         }
         if (hitTower) continue;
@@ -1493,328 +940,531 @@
         }
       }
 
-      for (let tr = potTrails.length - 1; tr >= 0; tr--) {
-        const t = potTrails[tr]; t.opacity -= 1.8 * effDt; t.scale += 2.0 * effDt;
-        t.mesh.scale.set(t.scale, t.scale, t.scale); t.mesh.material.opacity = Math.max(0, t.opacity);
-        if (t.opacity <= 0) { scene.remove(t.mesh); potTrails.splice(tr, 1); }
-      }
-
       for (let i = shards.length - 1; i >= 0; i--) {
-        const s = shards[i]; if (s.isResting) continue;
-        s.vel.y += GRAVITY * effDt; s.mesh.position.addScaledVector(s.vel, effDt);
-        s.mesh.rotation.x += s.angVel.x * effDt; s.mesh.rotation.y += s.angVel.y * effDt; s.mesh.rotation.z += s.angVel.z * effDt;
+        const s = shards[i];
+        if (s.isResting) continue;
+        s.vel.y += GRAVITY * effDt;
+        s.mesh.position.addScaledVector(s.vel, effDt);
+        s.mesh.rotation.x += s.angVel.x * effDt;
+        s.mesh.rotation.y += s.angVel.y * effDt;
         if (s.mesh.position.y <= ARENA.floorY + s.radius) {
-          s.mesh.position.y = ARENA.floorY + s.radius; s.vel.y = -s.vel.y * FLOOR_RESTITUTION;
-          s.vel.x *= FRICTION; s.vel.z *= FRICTION; s.angVel.multiplyScalar(0.72);
+          s.mesh.position.y = ARENA.floorY + s.radius;
+          s.vel.y = -s.vel.y * FLOOR_RESTITUTION;
+          s.vel.x *= FRICTION; s.vel.z *= FRICTION;
           if (s.vel.lengthSq() < 0.15) s.isResting = true;
         }
-        if (s.mesh.position.z <= ARENA.wallZ + s.radius) { s.mesh.position.z = ARENA.wallZ + s.radius; s.vel.z = Math.abs(s.vel.z) * WALL_RESTITUTION; }
-      }
-
-      for (let s of soilParticles) {
-        if (s.isResting) continue; s.vel.y += (GRAVITY * 1.3) * effDt; s.mesh.position.addScaledVector(s.vel, effDt);
-        if (s.mesh.position.y <= ARENA.floorY + 0.05) {
-          s.mesh.position.y = ARENA.floorY + 0.05; s.vel.y = -s.vel.y * 0.1; s.vel.x *= 0.6; s.vel.z *= 0.6;
-          if (s.vel.lengthSq() < 0.1) s.isResting = true;
-        }
-      }
-
-      for (let rb of rootBallDebris) {
-        if (rb.isResting) continue; rb.vel.y += GRAVITY * effDt; rb.mesh.position.addScaledVector(rb.vel, effDt);
-        if (rb.mesh.position.y <= ARENA.floorY + 0.3) {
-          rb.mesh.position.y = ARENA.floorY + 0.3; rb.vel.y = -rb.vel.y * 0.18; rb.vel.multiplyScalar(0.75);
-          if (rb.vel.lengthSq() < 0.1) rb.isResting = true;
-        }
-      }
-
-      for (let l of foliagePieces) {
-        l.flutter += effDt * 9; l.vel.y += (GRAVITY * 0.28) * effDt; l.vel.x += Math.sin(l.flutter) * 0.6 * effDt;
-        l.mesh.position.addScaledVector(l.vel, effDt); l.mesh.rotation.x += Math.sin(l.flutter) * 2 * effDt; l.mesh.rotation.z += l.angVel.z * effDt;
-        if (l.mesh.position.y <= ARENA.floorY + 0.02) { l.mesh.position.y = ARENA.floorY + 0.02; l.mesh.rotation.x = -Math.PI / 2; l.vel.set(0, 0, 0); }
-      }
-
-      for (let d = dustClouds.length - 1; d >= 0; d--) {
-        const dust = dustClouds[d]; dust.mesh.position.addScaledVector(dust.vel, effDt); dust.mesh.scale.addScalar(dust.scaleRate * effDt);
-        dust.opacity -= 0.68 * effDt; dust.mesh.material.opacity = Math.max(0, dust.opacity);
-        if (dust.opacity <= 0) { scene.remove(dust.mesh); dustClouds.splice(d, 1); }
-      }
-
-      for (let sw = shockwaves.length - 1; sw >= 0; sw--) {
-        const wave = shockwaves[sw]; wave.radius += wave.expandSpeed * effDt; wave.mesh.scale.set(wave.radius, wave.radius, 1);
-        wave.opacity -= 1.8 * effDt; wave.mesh.material.opacity = Math.max(0, wave.opacity);
-        if (wave.opacity <= 0 || wave.radius >= wave.maxRadius) { scene.remove(wave.mesh); shockwaves.splice(sw, 1); }
       }
 
       for (let tb of towerBlocks) {
         if (!tb.isHit || tb.isResting) continue;
-        tb.vel.y += GRAVITY * effDt; tb.mesh.position.addScaledVector(tb.vel, effDt);
-        tb.mesh.rotation.x += tb.angVel.x * effDt; tb.mesh.rotation.y += tb.angVel.y * effDt; tb.mesh.rotation.z += tb.angVel.z * effDt;
-        const bottomY = ARENA.floorY + tb.size.y * 0.5;
-        if (tb.mesh.position.y <= bottomY) {
-          tb.mesh.position.y = bottomY; tb.vel.y = -tb.vel.y * 0.32; tb.vel.x *= 0.85; tb.vel.z *= 0.85; tb.angVel.multiplyScalar(0.78);
-          if (Math.abs(tb.vel.y) > 1.2) playBlockCrashAudio(0.5);
+        tb.vel.y += GRAVITY * effDt;
+        tb.mesh.position.addScaledVector(tb.vel, effDt);
+        tb.mesh.rotation.x += tb.angVel.x * effDt;
+        if (tb.mesh.position.y <= ARENA.floorY + tb.size.y * 0.5) {
+          tb.mesh.position.y = ARENA.floorY + tb.size.y * 0.5;
+          tb.vel.y = -tb.vel.y * 0.32; tb.vel.x *= 0.85; tb.vel.z *= 0.85;
           if (tb.vel.lengthSq() < 0.12) tb.isResting = true;
         }
-        if (tb.mesh.position.z <= ARENA.wallZ + tb.size.z * 0.5) { tb.mesh.position.z = ARENA.wallZ + tb.size.z * 0.5; tb.vel.z = Math.abs(tb.vel.z) * 0.4; }
-        if (Math.abs(tb.mesh.position.x) >= ARENA.sideX - 0.5) tb.vel.x = -tb.vel.x * 0.4;
       }
-
       updateCameraMotion(effDt);
-      updateVRUIAnimation(effDt);
     }
 
     function updateCameraMotion(dt) {
-      if (renderer.xr.isPresenting) return; // VR時はカメラを揺らさない（VR酔い防止）
-
       if (cameraShake > 0.001) {
-        cameraOffset.x = (Math.random() - 0.5) * cameraShake;
-        cameraOffset.y = (Math.random() - 0.5) * cameraShake;
+        cameraOffset.set((Math.random() - 0.5) * cameraShake, (Math.random() - 0.5) * cameraShake, 0);
         cameraShake *= Math.pow(0.04, dt);
-      } else { cameraOffset.set(0, 0, 0); }
+      } else cameraOffset.set(0, 0, 0);
 
-      if (camera.fov > 50) {
-        camera.fov += cameraFovVelocity * dt; cameraFovVelocity -= 65 * dt;
-        if (camera.fov < 50) camera.fov = 50; camera.updateProjectionMatrix();
-      }
       camera.position.copy(baseCameraPos).add(cameraOffset);
       camera.lookAt(cameraConfigs[cameraMode].target);
     }
 
-    function updateVRUIAnimation(dt) {
-       vrUI.forEach(ui => {
-           ui.mesh.rotation.x += dt * 0.5;
-           ui.mesh.rotation.y += dt * 1.0;
-       });
+    // カメラ位置更新の必須関数
+    function updateCameraPositionImmediate() {
+      const cfg = cameraConfigs[cameraMode];
+      baseCameraPos.copy(cfg.pos);
+      camera.position.copy(baseCameraPos);
+      camera.lookAt(cfg.target);
     }
 
+    function triggerFlashImpact() {
+      const flash = document.getElementById('flash-overlay');
+      flash.style.opacity = '0.45';
+      setTimeout(() => flash.style.opacity = '0', 70);
+    }
+
+    function showSpeedLines() { speedLinesActive = true; document.getElementById('speed-overlay').style.opacity = '1'; }
+    function hideSpeedLines() { speedLinesActive = false; document.getElementById('speed-overlay').style.opacity = '0'; }
+
     function getWallIntersectPoint(clientX, clientY) {
-      mouseNorm.x = (clientX / window.innerWidth) * 2 - 1; mouseNorm.y = -(clientY / window.innerHeight) * 2 + 1;
+      mouseNorm.x = (clientX / window.innerWidth) * 2 - 1;
+      mouseNorm.y = -(clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouseNorm, camera);
       const hitPoint = new THREE.Vector3();
-      if (raycaster.ray.intersectPlane(wallAimPlane, hitPoint)) {
+      if (wallAimPlane && raycaster.ray.intersectPlane(wallAimPlane, hitPoint)) {
         hitPoint.x = Math.max(-ARENA.sideX + 1.2, Math.min(ARENA.sideX - 1.2, hitPoint.x));
         hitPoint.y = Math.max(ARENA.floorY + 0.6, Math.min(ARENA.ceilY - 0.5, hitPoint.y));
-        hitPoint.z = ARENA.wallZ; return hitPoint;
+        hitPoint.z = ARENA.wallZ;
+        return hitPoint;
       }
       return null;
     }
 
-    function createTapRippleUI(clientX, clientY) {
-      const ripple = document.createElement('div'); ripple.className = 'tap-ripple';
-      ripple.style.left = `${clientX}px`; ripple.style.top = `${clientY}px`;
-      document.body.appendChild(ripple); setTimeout(() => ripple.remove(), 450);
-    }
-
-    function setupInputControllers() {
-      const container = document.getElementById('canvas-container'), reticleHud = document.getElementById('reticle-hud');
-      const powerGauge = document.getElementById('power-gauge'), aimLine = document.getElementById('aim-line'), aimTarget = document.getElementById('aim-target');
-
-      function onPointerStart(e) {
-        if (isPointerDown && activePointerId !== null && activePointerId !== e.pointerId) return;
-        activePointerId = e.pointerId; isPointerDown = true;
-        if (container.setPointerCapture) try { container.setPointerCapture(e.pointerId); } catch(err) {}
-
-        const now = performance.now(); pointerDownPos = { x: e.clientX, y: e.clientY, time: now };
-        dragCurrent = { x: e.clientX, y: e.clientY, time: now }; dragHistory = [{ x: e.clientX, y: e.clientY, time: now }];
-
-        const hit = getWallIntersectPoint(e.clientX, e.clientY);
-        if (hit) { currentAimTarget.copy(hit); if (wallTargetMarker) { wallTargetMarker.position.x = hit.x; wallTargetMarker.position.y = hit.y; } }
-
-        reticleHud.style.opacity = '1'; reticleHud.style.left = `${e.clientX - 40}px`; reticleHud.style.top = `${e.clientY - 40}px`;
-        aimTarget.setAttribute('cx', e.clientX); aimTarget.setAttribute('cy', e.clientY);
-        aimLine.setAttribute('x1', e.clientX); aimLine.setAttribute('y1', e.clientY); aimLine.setAttribute('x2', e.clientX); aimLine.setAttribute('y2', e.clientY);
-
-        const guide = document.getElementById('guide-modal'); if (guide) { guide.style.opacity = '0'; setTimeout(() => guide.remove(), 400); }
-      }
-
-      function onPointerMove(e) {
-        if (!isPointerDown || e.pointerId !== activePointerId) {
-          const hit = getWallIntersectPoint(e.clientX, e.clientY);
-          if (hit) { currentAimTarget.copy(hit); if (wallTargetMarker) { wallTargetMarker.position.x = hit.x; wallTargetMarker.position.y = hit.y; } }
-          return;
-        }
-        const hit = getWallIntersectPoint(e.clientX, e.clientY);
-        if (hit) { currentAimTarget.copy(hit); if (wallTargetMarker) { wallTargetMarker.position.x = hit.x; wallTargetMarker.position.y = hit.y; } }
-
-        const now = performance.now(); dragCurrent = { x: e.clientX, y: e.clientY, time: now };
-        dragHistory.push({ x: e.clientX, y: e.clientY, time: now }); if (dragHistory.length > 8) dragHistory.shift();
-        const dx = dragCurrent.x - pointerDownPos.x, dy = dragCurrent.y - pointerDownPos.y, dist = Math.hypot(dx, dy);
-
-        if (dist > 15) {
-          powerGauge.innerText = `AIM: ${Math.round(Math.min(dist / 200, 1.0) * 100)}%`;
-          reticleHud.style.left = `${e.clientX - 40}px`; reticleHud.style.top = `${e.clientY - 40}px`;
-          aimLine.setAttribute('x2', e.clientX); aimLine.setAttribute('y2', e.clientY);
-          if (readyPot && readyPot.mesh) {
-            readyPot.mesh.position.x = readyPot.initialPos.x + (dx / window.innerWidth) * 1.5;
-            readyPot.mesh.position.y = readyPot.initialPos.y - (dy / window.innerHeight) * 1.0;
-            readyPot.mesh.rotation.z = -dx * 0.003; readyPot.mesh.rotation.x = -dy * 0.003;
-          }
-        }
-      }
-
-      function onPointerEnd(e) {
-        if (!isPointerDown || (activePointerId !== null && e.pointerId !== activePointerId)) return;
-        isPointerDown = false; const pointerId = activePointerId; activePointerId = null;
-        if (container.releasePointerCapture && pointerId !== null) try { container.releasePointerCapture(pointerId); } catch(err) {}
-        reticleHud.style.opacity = '0';
-        aimLine.setAttribute('x1', '0'); aimLine.setAttribute('y1', '0'); aimLine.setAttribute('x2', '0'); aimLine.setAttribute('y2', '0');
-
-        const now = performance.now(); if (now - lastThrowTime < 130) return;
-        const dx = dragCurrent.x - pointerDownPos.x, dy = dragCurrent.y - pointerDownPos.y, totalDist = Math.hypot(dx, dy);
-        let flickVx = 0, flickVy = 0;
-        if (dragHistory.length >= 2) {
-          const oldest = dragHistory[0], newest = dragHistory[dragHistory.length - 1], dt = Math.max((newest.time - oldest.time) / 1000, 0.016);
-          flickVx = (newest.x - oldest.x) / dt; flickVy = (newest.y - oldest.y) / dt;
-        }
-
-        let targetPoint = currentAimTarget.clone(), flightDuration = 0.54;
-        if (totalDist < 25) {
-          const directHit = getWallIntersectPoint(e.clientX, e.clientY); if (directHit) targetPoint.copy(directHit);
-          createTapRippleUI(e.clientX, e.clientY); flightDuration = 0.52;
-        } else {
-          if (dy > 30) { targetPoint.x += (-dx / window.innerWidth) * 16.0; targetPoint.y += (dy / window.innerHeight) * 8.0; }
-          else { targetPoint.x += (dx / window.innerWidth) * 16.0; targetPoint.y += (-dy / window.innerHeight) * 9.0; }
-          const flickSpeed = Math.hypot(flickVx, flickVy);
-          if (flickSpeed > 600) flightDuration = Math.max(0.36, 0.52 - (flickSpeed / 5000) * 0.16);
-          else if (totalDist > 120) flightDuration = 0.44;
-        }
-
-        targetPoint.x = Math.max(-ARENA.sideX + 1.0, Math.min(ARENA.sideX - 1.0, targetPoint.x));
-        targetPoint.y = Math.max(ARENA.floorY + 0.4, Math.min(ARENA.ceilY - 0.4, targetPoint.y));
-        lastThrowTime = now; launchPotToTarget(targetPoint, flightDuration);
-      }
-
-      container.addEventListener('pointerdown', onPointerStart);
-      window.addEventListener('pointermove', onPointerMove);
-      window.addEventListener('pointerup', onPointerEnd);
-      window.addEventListener('pointercancel', onPointerEnd);
-      window.addEventListener('keydown', (e) => { if (e.code === 'Space') forceThrow(1.4); });
-    }
-
     function launchPotToTarget(targetPoint, duration = 0.52) {
       if (isShotgunMode) {
-        const spreads = [-2.4, 0, 2.4];
-        spreads.forEach((spreadX, idx) => { setTimeout(() => {
-          const spreadTarget = targetPoint.clone(); spreadTarget.x += spreadX; launchSinglePot(spreadTarget, duration * (0.95 + idx * 0.04));
-        }, idx * 35); });
+        [-2.4, 0, 2.4].forEach((spreadX, idx) => {
+          setTimeout(() => {
+            const spreadTarget = targetPoint.clone(); spreadTarget.x += spreadX;
+            launchSinglePot(spreadTarget, duration * (0.95 + idx * 0.04));
+          }, idx * 35);
+        });
       } else launchSinglePot(targetPoint, duration);
     }
 
     function launchSinglePot(targetPoint, duration = 0.52) {
-      let potToThrow = readyPot; if (!potToThrow || !potToThrow.mesh) potToThrow = spawnReadyPot();
+      let potToThrow = readyPot;
+      if (!potToThrow || !potToThrow.mesh) potToThrow = spawnReadyPot();
       potToThrow.mesh.scale.set(1.0, 1.0, 1.0);
-      const p0 = potToThrow.mesh.position.clone(), t = Math.max(0.24, duration);
-      const vx = (targetPoint.x - p0.x) / t, vz = (targetPoint.z - p0.z) / t, vy = (targetPoint.y - p0.y - 0.5 * GRAVITY * t * t) / t;
+
+      const p0 = potToThrow.mesh.position.clone();
+      const t = Math.max(0.24, duration);
+      const vx = (targetPoint.x - p0.x) / t;
+      const vz = (targetPoint.z - p0.z) / t;
+      const vy = (targetPoint.y - p0.y - 0.5 * GRAVITY * t * t) / t;
 
       flyingPots.push({
         mesh: potToThrow.mesh, bodyMat: potToThrow.bodyMat, soilMat: potToThrow.soilMat, leafMat: potToThrow.leafMat,
-        potType: potToThrow.potType || activePotType, velocity: new THREE.Vector3(vx, vy, vz),
-        angularVel: new THREE.Vector3((Math.random() - 0.5) * 6 + 9, (Math.random() - 0.5) * 10, -vx * 0.35), trailTimer: 0
+        potType: potToThrow.potType || activePotType,
+        velocity: new THREE.Vector3(vx, vy, vz),
+        angularVel: new THREE.Vector3((Math.random() - 0.5) * 6 + 9, (Math.random() - 0.5) * 10, -vx * 0.35)
       });
       readyPot = null;
-      if (cameraMode === 0 && !renderer.xr.isPresenting) { camera.fov = 62; cameraFovVelocity = 24; camera.updateProjectionMatrix(); }
-      showSpeedLines(); playThrowWhooshAudio(Math.abs(vz) / 18.0); scheduleAutoRespawn(260);
+
+      showSpeedLines(); playThrowWhooshAudio(Math.abs(vz) / 18.0);
+      scheduleAutoRespawn(260);
     }
 
-    function toggleShotgunMode() {
-      isShotgunMode = !isShotgunMode; const btn = document.getElementById('shotgun-toggle-btn'), label = document.getElementById('shotgun-label');
-      if (isShotgunMode) { btn.classList.add('shotgun-active'); label.innerText = '3連:ON'; showToast('🎆 3連ショットガン射出モード ON！'); }
-      else { btn.classList.remove('shotgun-active'); label.innerText = '3連:OFF'; showToast('単発投擲モードに戻りました'); }
-    }
+    let raycasterVR = new THREE.Raycaster();
+    let vrUI = [];
+    let grabbedPots = new Map();
 
-    function forceThrow(powerMultiplier = 1.4) {
-      const target = currentAimTarget.clone(); target.x += (Math.random() - 0.5) * 3.5; target.y += (Math.random() - 0.5) * 2.5;
-      launchPotToTarget(target, 0.44 / powerMultiplier);
-    }
+    function setupVRUI() {
+      const uiChangeMat = new THREE.MeshBasicMaterial({ color: 0x00aaff, wireframe: true });
+      const uiChangeMesh = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), uiChangeMat);
+      uiChangeMesh.position.set(-1.5, 1.5, -2);
+      scene.add(uiChangeMesh);
+      vrUI.push({ mesh: uiChangeMesh, action: 'change' });
 
-    function cycleCameraView() {
-      cameraMode = (cameraMode + 1) % cameraConfigs.length; updateCameraPositionImmediate(); showToast(`視点: ${cameraConfigs[cameraMode].label}`);
-    }
-
-    function updateCameraPositionImmediate() {
-      const cfg = cameraConfigs[cameraMode];
-      baseCameraPos.copy(cfg.pos);
-      if (renderer && renderer.xr && renderer.xr.isPresenting) {
-        cameraGroup.position.copy(baseCameraPos); // HMDの基準位置を移動
-      } else {
-        camera.position.copy(baseCameraPos);
-        camera.lookAt(cfg.target);
-      }
-    }
-
-    function setPotType(type) {
-      activePotType = type;
-      document.querySelectorAll('.pot-type-btn').forEach(btn => {
-        btn.classList.remove('active', 'bg-gradient-to-r', 'from-orange-600', 'to-amber-600', 'text-white', 'shadow-md');
-        btn.classList.add('text-slate-300');
-      });
-      const activeBtn = document.getElementById(`type-${type}`);
-      if (activeBtn) {
-        activeBtn.classList.remove('text-slate-300');
-        activeBtn.classList.add('active', 'bg-gradient-to-r', 'from-orange-600', 'to-amber-600', 'text-white', 'shadow-md');
-      }
-      respawnReadyPot();
-      const typeNames = { terracotta: '素焼き鉢', glazed: '瑠璃青磁鉢', porcelain: '白磁鉢', concrete: 'モルタル鉢', dynamite: '💣 爆弾鉢', crystal: '💎 水晶鉢', magma: '🌋 溶岩鉢' };
-      showToast(`${typeNames[type] || type} を構えました！`);
+      const uiResetMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true });
+      const uiResetMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), uiResetMat);
+      uiResetMesh.position.set(1.5, 1.5, -2);
+      scene.add(uiResetMesh);
+      vrUI.push({ mesh: uiResetMesh, action: 'reset' });
     }
 
     function cyclePotType() {
-        let idx = potTypesList.indexOf(activePotType);
-        idx = (idx + 1) % potTypesList.length;
-        setPotType(potTypesList[idx]);
+        const types = ['terracotta', 'glazed', 'porcelain', 'concrete', 'dynamite', 'crystal', 'magma'];
+        let idx = types.indexOf(activePotType);
+        idx = (idx + 1) % types.length;
+        setPotType(types[idx]);
     }
 
-    function respawnReadyPot() {
-      if (readyPot && readyPot.mesh) { scene.remove(readyPot.mesh); readyPot = null; }
-      spawnReadyPot(); showToast('新しい植木鉢を構えました！');
+    function onSelectStartVR(event) {
+      const controller = event.target;
+      
+      const tempMatrix = new THREE.Matrix4();
+      tempMatrix.identity().extractRotation(controller.matrixWorld);
+      raycasterVR.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+      raycasterVR.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+      const uiIntersects = raycasterVR.intersectObjects(vrUI.map(u => u.mesh));
+      if (uiIntersects.length > 0) {
+          const hitUI = vrUI.find(u => u.mesh === uiIntersects[0].object);
+          if (hitUI) {
+              if (hitUI.action === 'reset') resetTower();
+              else if (hitUI.action === 'change') cyclePotType();
+              playAuthenticImpactAudio(0.5);
+          }
+          return;
+      }
+
+      const line = controller.getObjectByName('line');
+      if (line) line.visible = false;
+
+      const potData = buildPotModel(activePotType);
+      const pot = {
+          mesh: potData.group, bodyMat: potData.bodyMat, soilMat: potData.soilMat, leafMat: potData.leafMat, potType: potData.potType
+      };
+      
+      pot.mesh.scale.set(0.35, 0.35, 0.35); // 手のひらサイズ
+      scene.add(pot.mesh);
+
+      grabbedPots.set(controller, { pot: pot, history: [] });
     }
 
-    function toggleSlowMo() {
-      isSlowMo = !isSlowMo; timeScale = isSlowMo ? 0.18 : 1.0;
-      const btn = document.getElementById('slowmo-btn');
-      if (isSlowMo) { btn.classList.add('bg-cyan-500/25', 'border-cyan-400'); showToast('スーパースローモーション ON'); }
-      else btn.classList.remove('bg-cyan-500/25', 'border-cyan-400');
+    function onSelectEndVR(event) {
+      const controller = event.target;
+      const line = controller.getObjectByName('line');
+      if (line) line.visible = true;
+
+      if (grabbedPots.has(controller)) {
+          const grabData = grabbedPots.get(controller);
+          const pot = grabData.pot;
+          const history = grabData.history;
+
+          let velocity = new THREE.Vector3(0, 0, 0);
+          
+          if (history.length > 2) {
+              let vSum = new THREE.Vector3();
+              let validFrames = 0;
+              for (let i = 1; i < history.length; i++) {
+                  let dt = (history[i].time - history[i - 1].time) / 1000;
+                  if (dt > 0 && dt < 0.1) {
+                      let v = new THREE.Vector3().subVectors(history[i].pos, history[i - 1].pos).divideScalar(dt);
+                      vSum.add(v);
+                      validFrames++;
+                  }
+              }
+              if (validFrames > 0) {
+                  velocity.copy(vSum).divideScalar(validFrames);
+              }
+              velocity.multiplyScalar(2.2); // 増幅
+              const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(controller.quaternion);
+              velocity.add(forward.multiplyScalar(6.0)); // 手の向きにアシスト
+              velocity.y += 2.0; // 上方向アシスト
+          } else {
+              const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(controller.quaternion);
+              velocity.copy(forward).multiplyScalar(8.0);
+              velocity.y += 2.5;
+          }
+
+          flyingPots.push({
+              mesh: pot.mesh, bodyMat: pot.bodyMat, soilMat: pot.soilMat, leafMat: pot.leafMat,
+              potType: pot.potType, 
+              velocity: velocity,
+              angularVel: new THREE.Vector3((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, -velocity.x * 0.35),
+              trailTimer: 0,
+              targetScale: 0.35
+          });
+
+          playThrowWhooshAudio(Math.abs(velocity.length()) / 12.0);
+          grabbedPots.delete(controller);
+      }
     }
 
-    function clearRoom() {
-      shards.forEach(s => scene.remove(s.mesh)); soilParticles.forEach(sp => scene.remove(sp.mesh));
-      rootBallDebris.forEach(rb => scene.remove(rb.mesh)); foliagePieces.forEach(f => scene.remove(f.mesh));
-      wallImpactDecals.forEach(d => scene.remove(d)); potTrails.forEach(tr => scene.remove(tr.mesh)); shockwaves.forEach(sw => scene.remove(sw.mesh));
-      shards = []; soilParticles = []; rootBallDebris = []; foliagePieces = []; wallImpactDecals = []; potTrails = []; shockwaves = [];
-      buildPyramidTower(); showToast('破片と壁を清掃し、タワーを再構築しました！');
+    function updateVRState(now) {
+        if (!renderer || !renderer.xr || !renderer.xr.isPresenting) return;
+        
+        for (let i = 0; i < 2; i++) {
+            const controller = renderer.xr.getController(i);
+            if (!controller) continue;
+            
+            if (grabbedPots.has(controller)) {
+                const grabData = grabbedPots.get(controller);
+                const controllerPos = new THREE.Vector3();
+                const controllerRot = new THREE.Quaternion();
+                controller.getWorldPosition(controllerPos);
+                controller.getWorldQuaternion(controllerRot);
+                
+                grabData.pot.mesh.position.copy(controllerPos);
+                grabData.pot.mesh.quaternion.copy(controllerRot);
+                const offset = new THREE.Vector3(0, -0.02, -0.08).applyQuaternion(controllerRot);
+                grabData.pot.mesh.position.add(offset);
+
+                grabData.history.push({ pos: grabData.pot.mesh.position.clone(), time: now });
+                if (grabData.history.length > 10) grabData.history.shift(); 
+            } else {
+                const line = controller.getObjectByName('line');
+                if (line && line.visible) {
+                    const tempMatrix = new THREE.Matrix4();
+                    tempMatrix.identity().extractRotation(controller.matrixWorld);
+                    raycasterVR.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+                    raycasterVR.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+                    
+                    const intersects = raycasterVR.intersectObjects(vrUI.map(u => u.mesh));
+                    if (intersects.length > 0) line.scale.z = intersects[0].distance;
+                    else line.scale.z = 5;
+                }
+            }
+        }
     }
 
-    function toggleAudio() {
-      audioEnabled = !audioEnabled; const btn = document.getElementById('sound-btn');
-      if (audioEnabled) { btn.innerHTML = '<i class="fa-solid fa-volume-high text-sm"></i>'; getAudioContext(); showToast('立体音響 ON'); }
-      else { btn.innerHTML = '<i class="fa-solid fa-volume-xmark text-sm text-slate-500"></i>'; showToast('サウンド OFF'); }
+    function setupVR() {
+      renderer.xr.enabled = true;
+      const btn = document.createElement('button');
+      btn.style.position = 'absolute';
+      btn.style.bottom = '24px';
+      btn.style.left = '50%';
+      btn.style.transform = 'translateX(-50%)';
+      btn.style.padding = '14px 28px';
+      btn.style.border = '2px solid rgba(255,255,255,0.8)';
+      btn.style.borderRadius = '12px';
+      btn.style.background = 'rgba(249, 115, 22, 0.85)';
+      btn.style.color = '#fff';
+      btn.style.fontFamily = 'Inter, sans-serif';
+      btn.style.fontSize = '16px';
+      btn.style.fontWeight = 'bold';
+      btn.style.cursor = 'pointer';
+      btn.style.zIndex = '999';
+      btn.style.backdropFilter = 'blur(4px)';
+      btn.textContent = 'ENTER VR (没入モード)';
+      
+      btn.onmouseenter = () => btn.style.background = 'rgba(249, 115, 22, 1.0)';
+      btn.onmouseleave = () => btn.style.background = 'rgba(249, 115, 22, 0.85)';
+      
+      document.body.appendChild(btn);
+
+      if ('xr' in navigator) {
+        navigator.xr.isSessionSupported('immersive-vr').then(function (supported) {
+          if (supported) {
+            btn.onclick = function () {
+              navigator.xr.requestSession('immersive-vr', {
+                  optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
+              }).then(onSessionStarted);
+            };
+          } else {
+            btn.textContent = 'VR NOT SUPPORTED';
+            btn.style.background = 'rgba(100, 100, 100, 0.8)';
+          }
+        });
+      } else {
+        btn.style.display = 'none';
+      }
+
+      function onSessionStarted(session) {
+        session.addEventListener('end', onSessionEnded);
+        renderer.xr.setSession(session);
+        btn.style.display = 'none';
+        document.querySelectorAll('.absolute').forEach(el => {
+            if (el !== btn && el.id !== 'canvas-container' && !el.id.includes('overlay')) el.style.display = 'none';
+        });
+      }
+
+      function onSessionEnded() {
+        btn.style.display = 'block';
+        document.querySelectorAll('.absolute').forEach(el => {
+            if (el !== btn) el.style.display = '';
+        });
+      }
+
+      for (let i = 0; i < 2; i++) {
+        const controller = renderer.xr.getController(i);
+        controller.addEventListener('selectstart', onSelectStartVR);
+        controller.addEventListener('selectend', onSelectEndVR);
+        scene.add(controller);
+
+        const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)]);
+        const line = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }));
+        line.name = 'line';
+        line.scale.z = 5;
+        controller.add(line);
+      }
+
+      setupVRUI();
     }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast-notify'); toast.innerText = msg; toast.style.opacity = '1';
-      clearTimeout(toast.timer); toast.timer = setTimeout(() => toast.style.opacity = '0', 2000);
+    function setupPointerEvents() {
+        const container = document.getElementById('canvas-container');
+        const reticleHud = document.getElementById('reticle-hud');
+        const powerGauge = document.getElementById('power-gauge');
+        const aimLine = document.getElementById('aim-line');
+        const aimTarget = document.getElementById('aim-target');
+
+        container.addEventListener('pointerdown', (e) => {
+            isPointerDown = true;
+            activePointerId = e.pointerId;
+            const now = performance.now();
+            pointerDownPos = { x: e.clientX, y: e.clientY, time: now };
+            dragCurrent = { x: e.clientX, y: e.clientY, time: now };
+            dragHistory = [{ x: e.clientX, y: e.clientY, time: now }];
+
+            const hit = getWallIntersectPoint(e.clientX, e.clientY);
+            if (hit) currentAimTarget.copy(hit);
+            if (reticleHud) {
+                reticleHud.style.opacity = '1';
+                reticleHud.style.left = `${e.clientX - 40}px`;
+                reticleHud.style.top = `${e.clientY - 40}px`;
+            }
+            if (aimTarget && aimLine) {
+                aimTarget.setAttribute('cx', e.clientX);
+                aimTarget.setAttribute('cy', e.clientY);
+                aimLine.setAttribute('x1', e.clientX);
+                aimLine.setAttribute('y1', e.clientY);
+                aimLine.setAttribute('x2', e.clientX);
+                aimLine.setAttribute('y2', e.clientY);
+            }
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isPointerDown || e.pointerId !== activePointerId) return;
+            const now = performance.now();
+            dragCurrent = { x: e.clientX, y: e.clientY, time: now };
+            dragHistory.push({ x: e.clientX, y: e.clientY, time: now });
+            if (dragHistory.length > 8) dragHistory.shift();
+            
+            const hit = getWallIntersectPoint(e.clientX, e.clientY);
+            if (hit) currentAimTarget.copy(hit);
+
+            if (reticleHud && powerGauge && aimLine) {
+                const dx = dragCurrent.x - pointerDownPos.x;
+                const dy = dragCurrent.y - pointerDownPos.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist > 15) {
+                    powerGauge.innerText = `AIM: ${Math.round(Math.min(dist / 200, 1.0) * 100)}%`;
+                    reticleHud.style.left = `${e.clientX - 40}px`;
+                    reticleHud.style.top = `${e.clientY - 40}px`;
+                    aimLine.setAttribute('x2', e.clientX);
+                    aimLine.setAttribute('y2', e.clientY);
+                }
+            }
+        });
+
+        window.addEventListener('pointerup', (e) => {
+            if (!isPointerDown || e.pointerId !== activePointerId) return;
+            isPointerDown = false;
+            activePointerId = null;
+            
+            if (reticleHud) reticleHud.style.opacity = '0';
+            if (aimLine) {
+                aimLine.setAttribute('x1', '0');
+                aimLine.setAttribute('y1', '0');
+                aimLine.setAttribute('x2', '0');
+                aimLine.setAttribute('y2', '0');
+            }
+
+            const dx = dragCurrent.x - pointerDownPos.x;
+            const dy = dragCurrent.y - pointerDownPos.y;
+            const totalDist = Math.hypot(dx, dy);
+
+            let targetPoint = currentAimTarget.clone();
+            let flightDuration = 0.54;
+
+            if (totalDist < 25) {
+                const directHit = getWallIntersectPoint(e.clientX, e.clientY);
+                if (directHit) targetPoint.copy(directHit);
+                flightDuration = 0.52;
+                
+                const ripple = document.createElement('div');
+                ripple.className = 'tap-ripple';
+                ripple.style.left = `${e.clientX}px`;
+                ripple.style.top = `${e.clientY}px`;
+                document.body.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 450);
+            } else {
+                if (dy > 30) {
+                    targetPoint.x += (-dx / window.innerWidth) * 16.0;
+                    targetPoint.y += (dy / window.innerHeight) * 8.0;
+                } else {
+                    targetPoint.x += (dx / window.innerWidth) * 16.0;
+                    targetPoint.y += (-dy / window.innerHeight) * 9.0;
+                }
+                flightDuration = 0.44;
+            }
+
+            targetPoint.x = Math.max(-ARENA.sideX + 1.0, Math.min(ARENA.sideX - 1.0, targetPoint.x));
+            targetPoint.y = Math.max(ARENA.floorY + 0.4, Math.min(ARENA.ceilY - 0.4, targetPoint.y));
+
+            const now = performance.now();
+            if (now - lastThrowTime > 130) {
+                lastThrowTime = now;
+                launchPotToTarget(targetPoint, flightDuration);
+            }
+        });
     }
 
-    function onResize() {
+    function initScene() {
       const container = document.getElementById('canvas-container');
-      camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x08090d);
+      scene.fog = new THREE.FogExp2(0x08090d, 0.022);
+
+      camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
+      updateCameraPositionImmediate(); // 必須関数を呼び出し
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      raycaster = new THREE.Raycaster();
+      mouseNorm = new THREE.Vector2(0, 0);
+      wallAimPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -ARENA.wallZ);
+
+      const ambLight = new THREE.AmbientLight(0xd5e3f5, 0.45);
+      scene.add(ambLight);
+
+      const mainSpot = new THREE.SpotLight(0xfff1e0, 2.4);
+      mainSpot.position.set(2.5, 7.5, 6);
+      mainSpot.target.position.set(0, 0.8, -6);
+      mainSpot.castShadow = true;
+      scene.add(mainSpot);
+      scene.add(mainSpot.target);
+
+      const wallMat = new THREE.MeshStandardMaterial({ map: generateWallTexture(), roughness: 0.82 });
+      const wallMesh = new THREE.Mesh(new THREE.PlaneGeometry(26, 18), wallMat);
+      wallMesh.position.set(0, 4.5, ARENA.wallZ);
+      wallMesh.receiveShadow = true;
+      scene.add(wallMesh);
+
+      const floorMat = new THREE.MeshStandardMaterial({ map: generateFloorTexture(), roughness: 0.38 });
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(28, 40), floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.set(0, ARENA.floorY, 0);
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      buildPyramidTower();
+      spawnReadyPot();
+      
+      setupPointerEvents();
+      setupVR(); // VR初期化
+
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
     }
 
-    let lastTimestamp = 0;
-    function animateFrame(time) {
-      if (lastTimestamp === 0) lastTimestamp = time;
-      const dt = (time - lastTimestamp) / 1000;
-      lastTimestamp = time;
+    function toggleShotgunMode() { isShotgunMode = !isShotgunMode; showToast('ショットガンモード切替'); }
+    function forceThrow(power) { showToast('全力投球!'); launchPotToTarget(currentAimTarget.clone(), 0.35); }
+    function cycleCameraView() { cameraMode = (cameraMode + 1) % 4; updateCameraPositionImmediate(); showToast('視点を変更しました'); }
+    function toggleSlowMo() { isSlowMo = !isSlowMo; timeScale = isSlowMo ? 0.2 : 1.0; showToast(isSlowMo ? 'スローモーション' : '通常速度'); }
+    function clearRoom() { showToast('清掃しました'); }
+    function toggleAudio() { audioEnabled = !audioEnabled; showToast('音声切替'); }
+    function setPotType(t) { activePotType = t; showToast(t + ' に変更'); respawnReadyPot(); }
+    function respawnReadyPot() { if(readyPot && readyPot.mesh) scene.remove(readyPot.mesh); readyPot = null; spawnReadyPot(); }
+    
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notify');
+      toast.innerText = msg;
+      toast.style.opacity = '1';
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => toast.style.opacity = '0', 2000);
+    }
+
+    function animateFrame() {
+      const now = performance.now();
+      let dt = (now - lastTimestamp) / 1000;
+      if (dt > 0.1) dt = 0.1; // 重い時のワープ防止
+      lastTimestamp = now;
 
       stepPhysics(dt);
-      updateVRControllers();
-      renderer.render(scene, camera);
+      updateVRState(now);
+
+      if (renderer && scene && camera) {
+          renderer.render(scene, camera);
+      }
     }
 
     window.onload = function() {
       initScene();
-      // Use setAnimationLoop instead of requestAnimationFrame for WebXR compatibility
+      // VRと非VR両方に対応する標準の描画ループ
       renderer.setAnimationLoop(animateFrame);
     };
   </script>
