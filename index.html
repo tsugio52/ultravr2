@@ -349,6 +349,7 @@
     let controller1, controller2;
     let raycasterVR;
     let vrUI = []; // 3D UI objects for VR
+    let grabbedPots = new Map(); // VR用: 現在手で持っている鉢を管理
 
     // Simulation timing & scales
     let isSlowMo = false;
@@ -930,29 +931,83 @@
             return;
         }
 
-        // 2. Wall Target Check
-        const hitPoint = new THREE.Vector3();
-        const intersects = raycasterVR.ray.intersectPlane(wallAimPlane, hitPoint);
-        if (intersects) {
-          hitPoint.x = Math.max(-ARENA.sideX + 1.2, Math.min(ARENA.sideX - 1.2, hitPoint.x));
-          hitPoint.y = Math.max(ARENA.floorY + 0.6, Math.min(ARENA.ceilY - 0.5, hitPoint.y));
-          hitPoint.z = ARENA.wallZ;
+        // 2. 空間をピンチしたら、手元に鉢を出す（Grab）
+        // 手に持っている間はエイム用のレーザーを非表示にする
+        const line = controller.getObjectByName('line');
+        if (line) line.visible = false;
 
-          currentAimTarget.copy(hitPoint);
-          if (wallTargetMarker) {
-            wallTargetMarker.position.copy(hitPoint);
-          }
-          
-          launchPotToTarget(currentAimTarget.clone(), 0.45);
+        const potData = buildPotModel(activePotType);
+        const pot = {
+            mesh: potData.group, bodyMat: potData.bodyMat, soilMat: potData.soilMat, leafMat: potData.leafMat,
+            potType: potData.potType
+        };
+        
+        // シーンに追加（手の中に生成）
+        pot.mesh.position.set(0, 0, 0); 
+        pot.mesh.rotation.set(0, 0, 0);
+        scene.add(pot.mesh);
+
+        grabbedPots.set(controller, {
+            pot: pot,
+            history: [] // 投擲速度を計算するための位置履歴
+        });
+      }
+
+      function onSelectEndVR(event) {
+        const controller = event.target;
+        
+        // レーザーを再表示
+        const line = controller.getObjectByName('line');
+        if (line) line.visible = true;
+
+        if (grabbedPots.has(controller)) {
+            const grabData = grabbedPots.get(controller);
+            const pot = grabData.pot;
+            const history = grabData.history;
+
+            // 直前の腕の振りから投擲速度（Velocity）を計算
+            let velocity = new THREE.Vector3(0, 0, 0);
+            if (history.length > 1) {
+                const oldest = history[0];
+                const newest = history[history.length - 1];
+                const dt = Math.max((newest.time - oldest.time) / 1000, 0.016);
+                
+                velocity.subVectors(newest.pos, oldest.pos).divideScalar(dt);
+                
+                // ハンドトラッキングでの投擲は弱くなりがちなので、VR補正をかける
+                velocity.multiplyScalar(2.2); // 腕の振りを倍増
+                velocity.y += 2.5; // 重力に負けないよう少し上方向へふんわりアシスト
+                
+                // 腕を振っている方向へ少し追加アシスト
+                const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(controller.quaternion);
+                velocity.add(forward.multiplyScalar(2.0));
+            } else {
+                // 振らずにその場で手を離した場合は、軽く前へぽろっと落とす
+                const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(controller.quaternion);
+                velocity.copy(forward).multiplyScalar(4.0);
+                velocity.y += 1.5;
+            }
+
+            flyingPots.push({
+                mesh: pot.mesh, bodyMat: pot.bodyMat, soilMat: pot.soilMat, leafMat: pot.leafMat,
+                potType: pot.potType, velocity: velocity,
+                angularVel: new THREE.Vector3((Math.random() - 0.5) * 15, (Math.random() - 0.5) * 15, -velocity.x * 0.35),
+                trailTimer: 0
+            });
+
+            playThrowWhooshAudio(Math.abs(velocity.length()) / 18.0);
+            grabbedPots.delete(controller); // 手の中から削除
         }
       }
 
       controller1 = renderer.xr.getController(0);
       controller1.addEventListener('selectstart', onSelectStartVR);
+      controller1.addEventListener('selectend', onSelectEndVR); // 離した時のイベントを追加
       scene.add(controller1);
 
       controller2 = renderer.xr.getController(1);
       controller2.addEventListener('selectstart', onSelectStartVR);
+      controller2.addEventListener('selectend', onSelectEndVR); // 離した時のイベントを追加
       scene.add(controller2);
 
       // コントローラー・ハンドトラッキングのレイ（光線）
@@ -972,34 +1027,60 @@
     function updateVRControllers() {
       if (!renderer.xr.isPresenting) return;
       
+      const now = performance.now();
+
       [controller1, controller2].forEach(controller => {
         if (controller && controller.visible) {
-          const tempMatrix = new THREE.Matrix4();
-          tempMatrix.identity().extractRotation(controller.matrixWorld);
-          raycasterVR.ray.origin.setFromMatrixPosition(controller.matrixWorld);
-          raycasterVR.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+          
+          // 鉢を持っている場合は、鉢の位置を手に追従させる
+          if (grabbedPots.has(controller)) {
+              const grabData = grabbedPots.get(controller);
+              
+              // コントローラー（手）の世界座標を取得
+              const controllerPos = new THREE.Vector3();
+              const controllerRot = new THREE.Quaternion();
+              controller.matrixWorld.decompose(controllerPos, controllerRot, new THREE.Vector3());
 
-          let hitDist = 20;
-          const uiIntersects = raycasterVR.intersectObjects(vrUI.map(u => u.mesh));
-          if (uiIntersects.length > 0) {
-              hitDist = uiIntersects[0].distance;
+              grabData.pot.mesh.position.copy(controllerPos);
+              grabData.pot.mesh.quaternion.copy(controllerRot);
+              
+              // 手の中に埋まらないよう、少し手のひらの前方へオフセット
+              const offset = new THREE.Vector3(0, -0.05, -0.15).applyQuaternion(controllerRot);
+              grabData.pot.mesh.position.add(offset);
+
+              // 速度計算用に直近の数フレームの位置を記録
+              grabData.history.push({ pos: grabData.pot.mesh.position.clone(), time: now });
+              if (grabData.history.length > 5) grabData.history.shift(); // 過去5フレーム分を保持
+
           } else {
-              const hitPoint = new THREE.Vector3();
-              const intersects = raycasterVR.ray.intersectPlane(wallAimPlane, hitPoint);
-              if (intersects) {
-                  hitDist = raycasterVR.ray.origin.distanceTo(hitPoint);
-                  hitPoint.x = Math.max(-ARENA.sideX + 1.2, Math.min(ARENA.sideX - 1.2, hitPoint.x));
-                  hitPoint.y = Math.max(ARENA.floorY + 0.6, Math.min(ARENA.ceilY - 0.5, hitPoint.y));
-                  hitPoint.z = ARENA.wallZ;
-                  
-                  if (wallTargetMarker) {
-                    wallTargetMarker.position.copy(hitPoint);
+              // 持っていない時はUI操作用のレイキャスト（光線）を処理
+              const tempMatrix = new THREE.Matrix4();
+              tempMatrix.identity().extractRotation(controller.matrixWorld);
+              raycasterVR.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+              raycasterVR.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+              let hitDist = 20;
+              const uiIntersects = raycasterVR.intersectObjects(vrUI.map(u => u.mesh));
+              if (uiIntersects.length > 0) {
+                  hitDist = uiIntersects[0].distance;
+              } else {
+                  const hitPoint = new THREE.Vector3();
+                  const intersects = raycasterVR.ray.intersectPlane(wallAimPlane, hitPoint);
+                  if (intersects) {
+                      hitDist = raycasterVR.ray.origin.distanceTo(hitPoint);
+                      hitPoint.x = Math.max(-ARENA.sideX + 1.2, Math.min(ARENA.sideX - 1.2, hitPoint.x));
+                      hitPoint.y = Math.max(ARENA.floorY + 0.6, Math.min(ARENA.ceilY - 0.5, hitPoint.y));
+                      hitPoint.z = ARENA.wallZ;
+                      
+                      if (wallTargetMarker) {
+                        wallTargetMarker.position.copy(hitPoint);
+                      }
                   }
               }
+              
+              const line = controller.getObjectByName('line');
+              if (line) line.scale.z = hitDist;
           }
-          
-          const line = controller.getObjectByName('line');
-          if (line) line.scale.z = hitDist;
         }
       });
     }
